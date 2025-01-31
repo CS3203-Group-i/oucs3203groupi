@@ -10,12 +10,16 @@ https://www.python.org/downloads/
 During installation, check the box ✅ "Add Python to PATH
 
 3. Clone Repository
-git clone https://github.com/payleyrandels/oucs3203groupi.git
+command: git clone https://github.com/payleyrandels/oucs3203groupi.git
 
 5. Create Virtual Enviroment
-python -m venv venv
-.\venv\Scripts\Activate
+command: python -m venv venv
+command: .\.venv\Scripts\Activate
 
 7. Add Dependencies
-pip install beautifulsoup4 requests transformers
+command: pip install beautifulsoup4 requests transformers
 
+8. Branching
+command git checkout -b "ticket name"
+create a MR into main, with two peer reviewers
+once accepted merge into main 
