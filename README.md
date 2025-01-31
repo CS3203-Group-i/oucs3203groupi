@@ -10,7 +10,7 @@ https://www.python.org/downloads/
 During installation, check the box ✅ "Add Python to PATH
 
 3. Clone Repository
-git clone
+git clone https://github.com/payleyrandels/oucs3203groupi.git
 
 5. Create Virtual Enviroment
 python -m venv venv
