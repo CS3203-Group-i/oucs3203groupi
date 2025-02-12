@@ -1,0 +1,37 @@
+name: Run Hugging Face Model
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to run the model on'
+        required: true
+        default: 'hf_api_test'
+
+jobs:
+  run_hf_model:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the specified branch
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Set up Python environment
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m venv venv
+          . venv/bin/activate
+          pip install requests
+
+      - name: Run the Hugging Face model
+        env:
+          HF_TW_API: ${{ secrets.HF_TW_API }}  # Use secret in environment variables
+        run: |
+          . venv/bin/activate
+          python hugging_face_test.py
