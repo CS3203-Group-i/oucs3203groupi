@@ -24,26 +24,21 @@ def generate_code(prompt):
         return f"Error {response.status_code}: {response.json()}"
 
 # Example usage
-prompt = """You are a scheduling assistant. Given the following courses and their available sections, generate an optimal schedule that ensures:
-- No overlapping class times.
-- Exactly one section per course.
-- The final schedule is enclosed in \\boxed{} with no explanations.
-
+prompt = """Given the following list of courses with their corresponding sections, times, and days, create an optimal schedule that ensures no time conflicts while taking exactly one section from each course. You can only take one section per course, and the sections must not overlap with each other. Put your final answer within \boxed{}​. Do not reason step by step.
 Courses:
 Math 3333:
-- Section 01: 10-11am T/TR
-- Section 02: 12-1pm M/W/F
+Section 01: 10-11am T/TR
+Section 02: 12-1pm M/W/F
 Hist 1234:
-- Section 01: 10-11am T/TR
-- Section 02: 2-3pm M/W/F
+Section 01: 10-11am T/TR
+Section 02: 2-3pm M/W/F
 CS 3203:
-- Section 01: 10-11am M/W/F
-- Section 02: 4-5pm M/W/F
+Section 01: 10-11am M/W/F
+Section 02: 4-5pm M/W/F
 ENGR 2002:
-- Section 01: 3-4pm M/W/F
-- Section 02: 9-10am T/TR
-
-Return the optimal schedule enclosed in \\boxed{}."""  
+Section 01: 3-4pm M/W/F
+Section 02: 9-10am T/TR
+"""  
 
 generated_code = generate_code(prompt)
 print("Generated output: ", generated_code)
