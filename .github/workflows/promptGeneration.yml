@@ -1,22 +1,17 @@
 name: Run Hugging Face Model
 
 on:
-  workflow_dispatch:
-    inputs:
-      branch:
-        description: 'Branch to run the model on'
-        required: true
-        default: 'hf_api_test'
+  workflow_dispatch:  # This allows manual trigger without requiring any inputs
 
 jobs:
   run_hf_model:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout the specified branch
+      - name: Checkout the hf_api_test branch
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.event.inputs.branch }}
+          ref: 'hf_api_test'  # Hardcode the branch name here
 
       - name: Set up Python environment
         uses: actions/setup-python@v4
@@ -34,4 +29,4 @@ jobs:
           HF_TW_API: ${{ secrets.HF_TW_API }}  # Use secret in environment variables
         run: |
           . venv/bin/activate
-          python hugging_face_test.py
+          python hugging_face_test.py  # Ensure this file path is correct
