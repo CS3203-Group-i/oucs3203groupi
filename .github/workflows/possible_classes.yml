@@ -65,4 +65,5 @@ jobs:
       - name: Test course list
         run: |
           . venv/bin/activate
-          python3 backend/test_cases/is_class.py
+          cd backend/test_cases
+          python3 is_class.py
