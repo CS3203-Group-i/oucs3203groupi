@@ -1,0 +1,40 @@
+name: Run Course Extraction and Tests
+
+on:
+  workflow_dispatch:  # This allows manual trigger without requiring any inputs
+
+jobs:
+  extract_list:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python environment
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m venv venv
+          . venv/bin/activate
+          pip install requests bs4
+
+      - name: Extract possible course list
+        run: |
+          . venv/bin/activate
+          python3 backend/data_extraction/possible_classes.py
+
+      - name: Upload course list output
+        uses: actions/upload-artifact@v3
+        with:
+          name: course-list-output
+          path: backend/data_extraction/possible_classes_output.txt
+
+      - name: Test course list
+        run: |
+          . venv/bin/activate
+          python3 backend/test_cases/is_class.py
+  
