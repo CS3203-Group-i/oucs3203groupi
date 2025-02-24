@@ -28,7 +28,7 @@ jobs:
           python3 backend/data_extraction/possible_classes.py
 
       - name: Upload course list output
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: course-list-output
           path: backend/data_extraction/possible_classes_output.txt
