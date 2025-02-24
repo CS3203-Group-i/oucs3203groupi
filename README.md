@@ -13,8 +13,10 @@ During installation, check the box ✅ "Add Python to PATH
 command: git clone https://github.com/payleyrandels/oucs3203groupi.git
 
 5. Create Virtual Enviroment
-command: python -m venv venv
+```sh
+command: python3 -m venv venv
 command: .\.venv\Scripts\Activate
+```
 
 7. Add Dependencies
 command: pip install beautifulsoup4 requests transformers
