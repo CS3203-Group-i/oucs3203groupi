@@ -15,7 +15,7 @@ for block in soup.find_all("p", class_="courseblocktitle"):
     courses.append(f"{course_name}")
 
 # Write results to a text file
-with open("extracted_classes.txt", "w") as file:
+with open("backend/data_extraction/data/extracted_classes.txt", "w") as file:
     for course in courses:
         file.write(f"{course}\n")
 
