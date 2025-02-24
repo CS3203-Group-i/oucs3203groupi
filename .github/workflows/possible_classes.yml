@@ -31,7 +31,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: course-list-output
-          path: backend/data_extraction/possible_classes_output.txt
+          path: backend/data_extraction/data/extracted_classes.txt 
 
       - name: Test course list
         run: |
