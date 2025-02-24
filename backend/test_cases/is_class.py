@@ -39,3 +39,4 @@ if __name__ == "__main__":
         print("All tests passed.")
     else:
         print("All tests did NOT pass.")
+        sys.exit(1)
