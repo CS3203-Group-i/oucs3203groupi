@@ -58,6 +58,10 @@ jobs:
           name: course-list-output
           path: backend/data_extraction/data/  # This is where you want to place the artifact
 
+      - name: List files in the directory
+        run: |
+          ls -R backend/data_extraction/data/
+    
       - name: Test course list
         run: |
           . venv/bin/activate
