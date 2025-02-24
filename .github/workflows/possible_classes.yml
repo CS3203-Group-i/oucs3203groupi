@@ -67,3 +67,14 @@ jobs:
           . venv/bin/activate
           cd backend/test_cases
           python3 is_class.py
+
+      - name: Deploy to pages
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'actions@github.com'
+          git checkout main
+          git pull origin main
+          git add backend/data_extraction/data/extracted_classes.txt
+          git commit -m "Updated course list"
+          git push https://x-access-token:${{ secrets.GH_ARTIFACT_TK }}@github.com/${{ github.repository }}.git main
+
