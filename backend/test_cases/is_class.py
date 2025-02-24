@@ -5,7 +5,7 @@ def load_courses_from_file(filename):
     return courses
 
 # Load the course list from the file
-cs_courses = load_courses_from_file("extracted_classes.txt")
+cs_courses = load_courses_from_file("../data_extraction/data/extracted_classes.txt")
 
 # Function to check if the course exists in the set
 def is_class(course, course_set):
@@ -13,9 +13,20 @@ def is_class(course, course_set):
 
 # Test cases
 if __name__ == "__main__":
-    print(is_class("C S 1213.  Programming for Non-Majors with Python.", cs_courses))  # Expected: True (if it's in the file)
-    print(is_class("C S 3000.  Study of Procrastination.", cs_courses))  # Expected: False (if it's not in the file)
-    print(is_class("C S 2813.  Discrete Structures.", cs_courses))  # Expected: True (if it's in the file)
-    print(is_class("C S 1111.  Study of Grooup Projects", cs_courses))  # Expected: False (if it's not in the file)
-
+    # Define test cases as tuples (course, expected result)
+    test_cases = [
+        ("C S 1213.  Programming for Non-Majors with Python.", True),  # Expected: True
+        ("C S 3000.  Study of Procrastination.", False),  # Expected: False
+        ("C S 2414.  Data Structures.", True),  # Expected: True
+        ("C S 1111.  Study of Group Projects", False),  # Expected: False
+    ]
     
+    # Check if each test case is correct
+    for course, expected in test_cases:
+        result = is_class(course, cs_courses)
+        if result == expected:
+            print(f"Test passed for course: {course} Expected {result} and got {result}")
+        else:
+            print(f"Test failed for course: {course} Expected {expected}, but got {result}")
+    
+    print("All tests passed.")

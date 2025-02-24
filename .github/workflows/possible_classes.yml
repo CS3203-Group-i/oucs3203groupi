@@ -32,3 +32,9 @@ jobs:
         with:
           name: course-list-output
           path: backend/data_extraction/possible_classes_output.txt
+
+      - name: Test course list
+        run: |
+          . venv/bin/activate
+          python3 backend/test_cases/is_class.py
+  
