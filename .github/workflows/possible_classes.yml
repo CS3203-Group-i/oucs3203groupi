@@ -56,7 +56,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: course-list-output
-          path: ./backend/data_extraction/data  # This is where you want to place the artifact
+          path: backend/data_extraction/data/  # This is where you want to place the artifact
 
       - name: Test course list
         run: |
