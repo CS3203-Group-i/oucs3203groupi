@@ -40,30 +40,31 @@
     <script>
         // Fetch the course list from the extracted_classes.txt file
         fetch('../backend/data_extraction/data/extracted_classes.txt')
-            .then(response => response.text())
-            .then(data => {
-                const courses = data.split('\n');  // Split the file by new lines
-                const courseListElement = document.getElementById('course-list');
-                const timestampElement = document.getElementById('timestamp');
+        .then(response => response.text())
+        .then(data => {
+            const courses = data.split('\n');  // Split the file by new lines
+            const courseListElement = document.getElementById('course-list');
+            const timestampElement = document.getElementById('timestamp');
 
-                // The first line contains the timestamp
-                const timestamp = courses.shift();  // Remove the first line (timestamp)
+            // The first line contains the timestamp
+            const timestamp = courses.shift();  // Remove the first line (timestamp)
 
-                // Display the timestamp in the HTML
-                timestampElement.textContent = `Parsed and extracted at time: ${timestamp}`;
+            // Display the timestamp in the HTML
+            timestampElement.textContent = `${timestamp}`;
 
-                // Add each course as a list item
-                courses.forEach(course => {
-                    if (course.trim() !== "") {  // Ignore empty lines
-                        const li = document.createElement('li');
-                        li.textContent = course;
-                        courseListElement.appendChild(li);
-                    }
-                });
-            })
-            .catch(error => {
-                console.error('Error loading the course list:', error);
+            // Add each course as a list item
+            courses.forEach(course => {
+                if (course.trim() !== "") {  // Ignore empty lines
+                    const li = document.createElement('li');
+                    li.textContent = course;
+                    courseListElement.appendChild(li);
+                }
             });
+        })
+        .catch(error => {
+            console.error('Error loading the course list:', error);
+        });
+
     </script>
 
 </body>
