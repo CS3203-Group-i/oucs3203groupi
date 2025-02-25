@@ -22,11 +22,17 @@
             padding: 10px;
             border-radius: 4px;
         }
+        .timestamp {
+            font-size: 1.2em;
+            color: #555;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
 
     <h1>Course List</h1>
+    <div class="timestamp" id="timestamp"></div>  <!-- Where the timestamp will go -->
     <ul id="course-list">
         <!-- Course list will be populated here -->
     </ul>
@@ -38,6 +44,13 @@
             .then(data => {
                 const courses = data.split('\n');  // Split the file by new lines
                 const courseListElement = document.getElementById('course-list');
+                const timestampElement = document.getElementById('timestamp');
+
+                // The first line contains the timestamp
+                const timestamp = courses.shift();  // Remove the first line (timestamp)
+
+                // Display the timestamp in the HTML
+                timestampElement.textContent = `Parsed and extracted at time: ${timestamp}`;
 
                 // Add each course as a list item
                 courses.forEach(course => {
