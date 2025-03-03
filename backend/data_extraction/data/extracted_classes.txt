@@ -1,4 +1,4 @@
-Parsed and extracted at time: 2025-03-03 19:23:23
+Parsed and extracted at time: 2025-03-03 19:27:59
 
 C S 1213.  Programming for Non-Majors with Python.
 C S 1313.  Programming for Non-Majors with C.
