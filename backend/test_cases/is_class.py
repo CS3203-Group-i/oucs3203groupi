@@ -19,6 +19,7 @@ if __name__ == "__main__":
     
     # Test cases with expected outcomes
     test_cases = [
+        ("", False),  # Outcome should be false, Boundary condition for empty string
         ("C S 1213.  Programming for Non-Majors with Python.", True),  # Outcome should be true, it exists
         ("C S 3000.  Study of Procrastination.", False),  # Outcome should be false, it doesn't exist
         ("C S 2414.  Data Structures.", True),  # Outcome should be true, it exists
