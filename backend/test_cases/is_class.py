@@ -11,6 +11,8 @@ cs_courses = load_courses_from_file("../data_extraction/data/extracted_classes.t
 def is_class(course, course_set):
     return course in course_set  # true if exists and false if does not exist in txt
 
+# this is a test comment
+
 # Test cases
 if __name__ == "__main__":
     #edge case
