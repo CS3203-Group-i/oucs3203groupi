@@ -27,7 +27,7 @@ if __name__ == "__main__":
         ("C S 2414.  Data Structures.", True),  # Outcome should be true, it exists
         ("C S 1111.  Study of Group Projects", False),  # Outcome should be false, it doesn't exist
     ]
-    #hi 
+    #hi bruh
     # Variable to check if all tests passed
     tests_all_passed = True
 
