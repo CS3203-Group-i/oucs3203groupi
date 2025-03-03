@@ -13,6 +13,10 @@ def is_class(course, course_set):
 
 # Test cases
 if __name__ == "__main__":
+    #edge case
+    empty_courses = set()
+    assert is_class("C S 1213. Programming for Non-Majors with Python.", empty_courses) == False, "Failed edge case: Empty dataset"
+    
     # Test cases with expected outcomes
     test_cases = [
         ("C S 1213.  Programming for Non-Majors with Python.", True),  # Outcome should be true, it exists
