@@ -11,7 +11,7 @@ C S 2414.  Data Structures.
 C S 2614.  Computer Organization.
 C S 2813.  Discrete Structures.
 C S 2970.  Special Topics/Seminar.
-C S 3113.  Introduction to Operating Systems.
+C S 3113.  Hello Welcome to my world.
 C S 3203.  Software Engineering.
 C S 3323.  Principles of Programming Languages.
 C S 3440.  Mentored Research Experience.
