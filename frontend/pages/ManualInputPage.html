@@ -217,13 +217,14 @@
                     + document.getElementById("courseCodeInput").value + ";"
                     + document.getElementById("semesterInput").value;
 
-                let blob = new Blob([allInputs], { type: "text/plain" });
-                let link = document.createElement("a");
-                link.href = URL.createObjectURL(blob);
-                link.download = "courseData.txt";
-                document.body.appendChild(link); // Append to the body
-                link.click();
-                document.body.removeChild(link); // Clean up
+                // Send data to the backend (Node.js required)
+                fetch('http://127.0.0.1:5000/save', { // Flask runs on port 5000
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content: allInputs })
+                }).then(response => response.json())
+                .then(data => console.log("Server Response:", inputData))
+                .catch(error => console.error("Error:", error));
 
                 console.log(allInputs); // Debugging output
 
