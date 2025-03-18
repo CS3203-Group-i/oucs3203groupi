@@ -110,7 +110,7 @@
                     <!-- Buttons Group -->
                     <div class="d-flex gap-3">
                         <button type="button" class="btn btn-primary btn-lg" id="addClassBtn">Add Class</button>
-                        <button type="button" class="btn btn-primary btn-lg">Submit</button>
+                        <button type="button" class="btn btn-primary btn-lg" id="submitBtn">Submit</button>
                     </div>
                 </div>
 
@@ -170,6 +170,12 @@
             </div>
         </div>
 
+
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" 
+        integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" 
+        integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
+
         <script>
             let allInputs = ""; // Variable to store all input text
     
@@ -188,7 +194,29 @@
                 document.getElementById("classNameInput").value + ";"
                     + document.getElementById("courseCodeInput").value + ";"
                     + document.getElementById("semesterInput").value;
-    
+
+                console.log(allInputs); // Debugging output
+
+            });
+        </script>
+
+        <script>
+            document.getElementById("submitBtn").addEventListener("click", function () {
+                let text = document.getElementById("classNameInput").value + ";"
+                    + document.getElementById("courseCodeInput").value + ";"
+                    + document.getElementById("semesterInput").value;
+                
+                if (text.trim() === "") {
+                    alert("Please enter some text before saving.");
+                    return;
+                }
+
+                // Append new input with a newline character
+                allInputs += text + "\n";
+                document.getElementById("classNameInput").value + ";"
+                    + document.getElementById("courseCodeInput").value + ";"
+                    + document.getElementById("semesterInput").value;
+
                 let blob = new Blob([allInputs], { type: "text/plain" });
                 let link = document.createElement("a");
                 link.href = URL.createObjectURL(blob);
@@ -196,13 +224,11 @@
                 document.body.appendChild(link); // Append to the body
                 link.click();
                 document.body.removeChild(link); // Clean up
+
+                console.log(allInputs); // Debugging output
+
             });
         </script>
 
-
-        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" 
-        integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" 
-        integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
     </body>
 </html>
