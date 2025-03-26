@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Test: Regenerate Schedule</title>
+</head>
+<body>
+  <h2>Running Test Case for Regenerate Schedule</h2>
+  <div id="results"></div>
+
+  <script>
+    async function regenerateScheduleTest() {
+      const testCourses = ["4993", "3980"];
+      const res = await fetch("extracted_classnav.txt");
+      const text = await res.text();
+      const lines = text.split("\n");
+
+      const matches = {};
+      for (const line of lines) {
+        for (const course of testCourses) {
+          if (line.includes(`| ${course} |`)) {
+            if (!matches[course]) matches[course] = [];
+            matches[course].push(line);
+          }
+        }
+      }
+
+      let output = "<h3>Test Results</h3>";
+      let passed = true;
+
+      for (const course of testCourses) {
+        const entries = matches[course];
+        if (!entries || entries.length === 0) {
+          output += `<p>❌ No entries found for course ${course}</p>`;
+          passed = false;
+        } else {
+          const pick = entries[Math.floor(Math.random() * entries.length)];
+          output += `<p>✅ Course ${course} - Random Pick: <pre>${pick}</pre></p>`;
+        }
+      }
+
+      output += `<p><strong>${passed ? "✅ All test cases passed." : "❌ Test failed."}</strong></p>`;
+      document.getElementById("results").innerHTML = output;
+    }
+
+    // Auto-run on load
+    window.onload = regenerateScheduleTest;
+  </script>
+</body>
+</html>
