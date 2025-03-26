@@ -3,16 +3,15 @@ import unittest
 class TestAsynchPreference(unittest.TestCase):
     # Test if asynchPrefEnabled is true
     def test_asynch_preference_enabled(self):
-        result = validate_asynch_preference("Intro to Programming;2586;Fall 2026;asynch:true")
+        result = validate_asynch_preference("Intro to Programming;2586;Fall 2026;\nasynch:true")
         #print(result)
         self.assertTrue(result is True)
 
     # Test if asynchPrefEnabled is false
     def test_asynch_preference_disabled(self):
-        result = validate_asynch_preference("Data Structures;58328;Fall 2027;asynch:false")
+        result = validate_asynch_preference("Data Structures;58328;Fall 2027;/nasynch:false")
         #print(result)
         self.assertFalse(result is True)
-
 
 def validate_asynch_preference(class_data):
     """Parses class data and checks if asynchronous preference is enabled."""
