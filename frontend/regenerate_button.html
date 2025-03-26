@@ -9,14 +9,21 @@
       border-collapse: collapse;
       padding: 6px;
     }
+    .input-group {
+      margin-bottom: 5px;
+    }
   </style>
 </head>
 <body>
   <h2>Fall 2025 Regenerate Schedule</h2>
 
-  <label for="courseInput">Enter up to 10 course numbers (e.g. 4993, 3980):</label><br>
-  <input type="text" id="courseInput" placeholder="e.g. 4993, 3980">
-  <button onclick="regenerateSchedule()">Regenerate Schedule</button>
+  <div id="courseInputs">
+    <div class="input-group">
+      <input type="text" class="courseInput" placeholder="e.g. MATH 3113">
+    </div>
+  </div>
+  <button onclick="addCourseInput()">➕ Add Another Course</button>
+  <button onclick="regenerateSchedule()">🔁 Regenerate Schedule</button>
 
   <table id="scheduleTable" style="margin-top:20px; display:none;">
     <thead>
@@ -28,24 +35,44 @@
   </table>
 
   <script>
-    async function regenerateSchedule() {
-      const input = document.getElementById("courseInput").value.trim();
-      const courses = input.split(",").map(c => c.trim()).filter(c => c);
-      if (courses.length === 0 || courses.length > 10) {
-        alert("Please enter between 1 and 10 course numbers.");
+    function addCourseInput() {
+      const inputContainer = document.getElementById("courseInputs");
+      const currentInputs = inputContainer.querySelectorAll(".courseInput").length;
+      if (currentInputs >= 10) {
+        alert("You can only enter up to 10 courses.");
         return;
       }
 
-      const res = await fetch("extracted_classnav.txt");
+      const newDiv = document.createElement("div");
+      newDiv.className = "input-group";
+      newDiv.innerHTML = `<input type="text" class="courseInput" placeholder="e.g. CS 2114">`;
+      inputContainer.appendChild(newDiv);
+    }
+
+    async function regenerateSchedule() {
+      const inputs = Array.from(document.querySelectorAll(".courseInput"));
+      const courseQueries = inputs.map(input => input.value.trim()).filter(Boolean);
+      if (courseQueries.length === 0 || courseQueries.length > 10) {
+        alert("Please enter between 1 and 10 course queries.");
+        return;
+      }
+
+      const res = await fetch("../backend/data_extraction/data/extracted_classnav.txt");
       const text = await res.text();
       const lines = text.split("\n");
 
       const matches = {};
       for (const line of lines) {
-        for (const course of courses) {
-          if (line.includes(`| ${course} |`)) {
-            if (!matches[course]) matches[course] = [];
-            matches[course].push(line);
+        for (const query of courseQueries) {
+          const parts = query.trim().split(/\s+/);
+          const course = parts.pop();              // last part = course number
+          const subject = parts.join(" ");         // the rest = subject code
+
+          if (!subject || !course) continue;
+          const regex = new RegExp(`\\|\\s*${subject.toUpperCase()}\\s*\\|\\s*${course}\\s*\\|`);
+          if (regex.test(line)) {
+            if (!matches[query]) matches[query] = [];
+            matches[query].push(line);
           }
         }
       }
@@ -54,8 +81,8 @@
       tbody.innerHTML = "";
       let anyMatch = false;
 
-      for (const course of courses) {
-        const options = matches[course];
+      for (const query of courseQueries) {
+        const options = matches[query];
         if (options && options.length > 0) {
           anyMatch = true;
           const pick = options[Math.floor(Math.random() * options.length)];
@@ -68,8 +95,10 @@
       }
 
       document.getElementById("scheduleTable").style.display = anyMatch ? "table" : "none";
-      if (!anyMatch) alert("No matches found for the given course numbers.");
+      if (!anyMatch) alert("No matches found for the given courses.");
     }
   </script>
 </body>
 </html>
+
+
