@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 from pdfminer.high_level import extract_pages
 from pdfminer.layout import LTTextBox
+import re
 
 def extract_text_from_pdf_green_boxes_image_analysis(pdf_path):
     extracted_data = []
@@ -61,28 +62,23 @@ def extract_text_from_pdf_green_boxes_image_analysis(pdf_path):
     #print(extracted_data)
     return extracted_data
 
-def extract_text_from_pdf(pdf_path):
-    text = ""
-    try:
-        with open(pdf_path, 'rb') as file:
-            reader = PyPDF2.PdfReader(file)
-            for page_num in range(len(reader.pages)):
-                page = reader.pages[page_num]
-                text += page.extract_text()
-    except FileNotFoundError:
-        return f"Error: File not found at {pdf_path}"
-    except Exception as e:
-        return f"Error reading PDF: {e}"
-    return text
-
 # Function to read courses from a text file and filter for CS courses
-def read_cs_courses(cs_file_path):
-    cs_courses = set()
+# Function to read courses from a text file and filter for CS courses
+def read_courses(cs_file_path):
+    courses = set()
     with open(cs_file_path, "r") as file:
         for line in file:
-            if "CS" in line:  # Filter for CS courses
-                cs_courses.add(line.strip())
-    return cs_courses
+            if " C S " in line or " MATH " in line:
+                parts = line.split('|')
+                if len(parts) >= 5:
+                    subject = parts[1].strip().replace(" ", "") # Remove spaces from subject
+                    course_code = parts[2].strip()
+                    course_title = parts[4].strip()
+                    # Remove 'G' from the course code if it starts with 'G'
+                    if course_code.startswith('G'):
+                        course_code = course_code[1:]
+                    courses.add(f"{subject} {course_code} {course_title}")
+    return courses
 
 # Function to read preferences from a text file
 def read_preferences(preferences_file_path):
@@ -94,30 +90,68 @@ def read_preferences(preferences_file_path):
 
 # Main function to process all files and filter the courses
 def filter_courses(cs_file_path, preferences_file_path, pdf_path):
-    cs_courses = read_cs_courses(cs_file_path)
+    courses = read_courses(cs_file_path)
     preferences = read_preferences(preferences_file_path)
     green_courses = extract_text_from_pdf_green_boxes_image_analysis(pdf_path)
 
+
     #print()
     # Find intersection of all three sets
-    #filtered_courses = cs_courses.intersection(preferences, green_courses)
     
     extracted_texts = []
+    extracted_texts_id_only = []
     for item in green_courses:
         text = item['text']
-        # Split the text into parts based on spaces
         parts = text.split()
-        if len(parts) > 1:
-            # Combine the first two parts (e.g., "CS 4173" and "Computer Security")
-            combined_text = " ".join(parts[:2])
-            extracted_texts.append(combined_text)
-        else:
-            # If there's only one part, append it as is
-            extracted_texts.append(text)
+        combined_text_parts = []
+        include_rest = True
+        for part in parts:
+            if "Prereq" in part:
+                include_rest = False
+            if include_rest:
+                combined_text_parts.append(part)
 
+        if combined_text_parts:
+            extracted_texts.append(" ".join(combined_text_parts))
+            extracted_texts_id_only.append(f"{combined_text_parts[0]} {combined_text_parts[1]}")
+
+    courses_id_only = set()
+    for course_info in courses:
+        parts = course_info.split()
+        courses_id_only.add(f"{parts[0]} {parts[1]}")
+
+
+    #print(courses_id_only)
+
+
+    #print(extracted_texts)
+    #print(courses)
+    #print(courses)
+    filtered_courses = courses_id_only.intersection(set(extracted_texts_id_only))
+    print(filtered_courses)
     # Print the extracted texts
-    for text in extracted_texts:
-        print(text)
+    #for text in extracted_texts:
+        #print(text)
+
+    # right here, I want you to make something that will just the course code / subject from courses
+
+    filtered_courses = courses.intersection(set(extracted_texts))
+    #print("\nIntersection of CS Courses and Extracted Texts:")
+    #print(filtered_courses)
+
+    # Create a set of course IDs from the 'courses' read from the file
+    course_ids_from_file = set()
+    for course_info in courses:
+        parts = course_info.split(" ", 2) # Split into Subject Code and the rest
+        if len(parts) >= 2:
+            course_ids_from_file.add(f"{parts[0]} {parts[1]}")
+
+    filtered_courses_ids = course_ids_from_file.intersection(extracted_texts)
+    #print(filtered_courses_ids)
+    #print(extracted_texts)
+    #print(courses)
+    #print("\nIntersection of Course IDs:")
+    #print(filtered_courses_ids)
 
     # Print the filtered courses
     #if filtered_courses:
