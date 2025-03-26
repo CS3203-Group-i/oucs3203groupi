@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Regenerate Schedule</title>
+  <style>
+    table, th, td {
+      border: 1px solid black;
+      border-collapse: collapse;
+      padding: 6px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Fall 2025 Regenerate Schedule</h2>
+
+  <label for="courseInput">Enter up to 10 course numbers (e.g. 4993, 3980):</label><br>
+  <input type="text" id="courseInput" placeholder="e.g. 4993, 3980">
+  <button onclick="regenerateSchedule()">Regenerate Schedule</button>
+
+  <table id="scheduleTable" style="margin-top:20px; display:none;">
+    <thead>
+      <tr>
+        <th>CRN</th><th>Subject</th><th>Course</th><th>Section</th><th>Title</th><th>Instructor</th><th>Dates</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    async function regenerateSchedule() {
+      const input = document.getElementById("courseInput").value.trim();
+      const courses = input.split(",").map(c => c.trim()).filter(c => c);
+      if (courses.length === 0 || courses.length > 10) {
+        alert("Please enter between 1 and 10 course numbers.");
+        return;
+      }
+
+      const res = await fetch("extracted_classnav.txt");
+      const text = await res.text();
+      const lines = text.split("\n");
+
+      const matches = {};
+      for (const line of lines) {
+        for (const course of courses) {
+          if (line.includes(`| ${course} |`)) {
+            if (!matches[course]) matches[course] = [];
+            matches[course].push(line);
+          }
+        }
+      }
+
+      const tbody = document.querySelector("#scheduleTable tbody");
+      tbody.innerHTML = "";
+      let anyMatch = false;
+
+      for (const course of courses) {
+        const options = matches[course];
+        if (options && options.length > 0) {
+          anyMatch = true;
+          const pick = options[Math.floor(Math.random() * options.length)];
+          const parts = pick.split("|").map(p => p.trim());
+          if (parts.length >= 7) {
+            const row = `<tr>${parts.slice(0, 7).map(p => `<td>${p}</td>`).join("")}</tr>`;
+            tbody.innerHTML += row;
+          }
+        }
+      }
+
+      document.getElementById("scheduleTable").style.display = anyMatch ? "table" : "none";
+      if (!anyMatch) alert("No matches found for the given course numbers.");
+    }
+  </script>
+</body>
+</html>
