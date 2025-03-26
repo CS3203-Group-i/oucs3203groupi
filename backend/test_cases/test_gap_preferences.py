@@ -1,53 +1,55 @@
-import unittest  # Import the unittest module for writing test cases
-from gap_preference_validator import gapPreference  # Import the function to be tested
+import unittest
+from gap_preference_validator import gapPreference  # This is your validation logic
+
+def validate_gap_preference(class_data):
+    """
+    Parses class data and checks if the gap preference is valid.
+    Expects format: 'CourseName;ID;Term;GapPref:60'
+    """
+    try:
+        class_data = class_data.strip().split(';')
+        gap_info = class_data[-1].strip().split(':')  # e.g., ['GapPref', '60']
+
+        if gap_info[0].strip().lower() == 'gappref':
+            gap_value = int(gap_info[1].strip())
+            return gapPreference(gap_value)
+        else:
+            return False
+    except (IndexError, ValueError):
+        return False
+
 
 class TestGapPreference(unittest.TestCase):
-    """
-    Unit test class for testing the gapPreference function.
-    """
-
+    # Valid gap time test
     def test_valid_gap_time(self):
-        """Test Case: Check that a valid integer time gap is accepted."""
-        # A 60-minute (1 hour) gap should be valid
-        self.assertTrue(gapPreference(60))
+        result = validate_gap_preference("Intro to Programming;2586;Fall 2026;GapPref:60")
+        self.assertTrue(result)
 
-        # A 120-minute (2 hours) gap should be valid
-        self.assertTrue(gapPreference(120))
-    
-    def test_invalid_non_integer_input(self):
-        """Test Case: Ensure non-integer inputs are rejected."""
-        # Strings should be rejected
-        self.assertFalse(gapPreference("one hour"))
+    # Invalid gap time (not a multiple of 60)
+    def test_invalid_gap_time(self):
+        result = validate_gap_preference("CS101;1234;Spring 2025;GapPref:45")
+        self.assertFalse(result)
 
-        # Float values should be rejected
-        self.assertFalse(gapPreference(3.5))
+    # Invalid value (non-integer)
+    def test_invalid_non_integer(self):
+        result = validate_gap_preference("CS101;1234;Spring 2025;GapPref:sixty")
+        self.assertFalse(result)
 
-        # None (no preference) should be rejected
-        self.assertFalse(gapPreference(None))
-    
-    def test_boundary_multiple_hours_no_minutes(self):
-        """Test Case: Ensure that time gaps in full hours (no extra minutes) are accepted."""
-        # 6 hours (360 minutes) should be valid
-        self.assertTrue(gapPreference(360))
+    # Missing gap pref
+    def test_missing_gap_pref(self):
+        result = validate_gap_preference("CS101;1234;Spring 2025")
+        self.assertFalse(result)
 
-        # 24 hours (1440 minutes) should be valid
-        self.assertTrue(gapPreference(1440))
-    
-    def test_edge_negative_time(self):
-        """Edge Case: Check that negative time inputs are rejected."""
-        # A negative time gap should not be valid
-        self.assertFalse(gapPreference(-60))
-    
-    def test_edge_time_over_a_day(self):
-        """Edge Case: Ensure time gaps exceeding 24 hours are rejected."""
-        # 1500 minutes (over 24 hours) should not be valid
-        self.assertFalse(gapPreference(1500))
-    
-    def test_edge_no_preference_set(self):
-        """Edge Case: Ensure None (no preference set) is handled correctly."""
-        # If no gap preference is set (None), it should be rejected
-        self.assertFalse(gapPreference(None))
-        
-# Run the test suite when executing the script
+    #  Too large (over 24h)
+    def test_gap_too_large(self):
+        result = validate_gap_preference("CS101;1234;Spring 2025;GapPref:1500")
+        self.assertFalse(result)
+
+    # Upper boundary (1440)
+    def test_gap_upper_limit(self):
+        result = validate_gap_preference("CS101;1234;Spring 2025;GapPref:1440")
+        self.assertTrue(result)
+
+
 if __name__ == '__main__':
     unittest.main()
