@@ -70,14 +70,18 @@ def read_courses(cs_file_path):
         for line in file:
             if " C S " in line or " MATH " in line:
                 parts = line.split('|')
-                if len(parts) >= 5:
-                    subject = parts[1].strip().replace(" ", "") # Remove spaces from subject
+                if len(parts) >= 6:  # Ensure we have enough parts
+                    subject = parts[1].strip().replace(" ", "")
                     course_code = parts[2].strip()
                     course_title = parts[4].strip()
+                    section = parts[3].strip()  # Assuming teacher is here
+                    teacher = parts[5].strip() # Assuming date/time is here
+                    date = parts[6].strip()
                     # Remove 'G' from the course code if it starts with 'G'
                     if course_code.startswith('G'):
                         course_code = course_code[1:]
-                    courses.add(f"{subject} {course_code} {course_title}")
+                    courses.add(f"{subject} {course_code} {course_title} | Section: {section} | Teacher: {teacher} | Dates: {date}")
+
     return courses
 
 # Function to read preferences from a text file
@@ -93,7 +97,7 @@ def filter_courses(cs_file_path, preferences_file_path, pdf_path):
     courses = read_courses(cs_file_path)
     preferences = read_preferences(preferences_file_path)
     green_courses = extract_text_from_pdf_green_boxes_image_analysis(pdf_path)
-
+    print(courses)
 
     #print()
     # Find intersection of all three sets
@@ -116,6 +120,7 @@ def filter_courses(cs_file_path, preferences_file_path, pdf_path):
             extracted_texts_id_only.append(f"{combined_text_parts[0]} {combined_text_parts[1]}")
 
     courses_id_only = set()
+    course_map = {}
     for course_info in courses:
         parts = course_info.split()
         courses_id_only.add(f"{parts[0]} {parts[1]}")
@@ -129,6 +134,13 @@ def filter_courses(cs_file_path, preferences_file_path, pdf_path):
     #print(courses)
     filtered_courses = courses_id_only.intersection(set(extracted_texts_id_only))
     print(filtered_courses)
+
+    print("\nFull Information of Intersected Courses:")
+    for course_info in courses:
+        parts = course_info.split()
+        course_id_file = f"{parts[0]} {parts[1]}" if len(parts) >= 2 else parts[0]
+        if course_id_file in filtered_courses:
+            print(course_info)
     # Print the extracted texts
     #for text in extracted_texts:
         #print(text)
