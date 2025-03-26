@@ -6,9 +6,16 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from pathlib import Path
 import time
+from selenium.webdriver.chrome.options import Options
 
-# Set up Chrome WebDriver
-driver = webdriver.Chrome()
+# Set Chrome options
+chrome_options = Options()
+chrome_options.add_argument("--headless")  # Run without GUI
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--disable-dev-shm-usage")
+
+# Initialize WebDriver
+driver = webdriver.Chrome(options=chrome_options)
 
 # Load the Fall 2025 semester directly
 driver.get("https://classnav.ou.edu/#semester/202510")
@@ -39,6 +46,7 @@ while True:
             course = cols[3].text.strip()
             section = cols[4].text.strip()
             title = cols[5].text.strip()
+            print(title)
             instructor = cols[6].text.strip()
             dates = cols[7].text.strip()
             all_data.append([crn, subject, course, section, title, instructor, dates])
@@ -60,7 +68,7 @@ while True:
 timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 # Set output path
-output_path = Path("backend/data_extraction/data/extracted_classnav.txt")
+output_path = Path("data/extracted_classnav.txt")
 output_path.parent.mkdir(parents=True, exist_ok=True)
 
 # Write results to file
