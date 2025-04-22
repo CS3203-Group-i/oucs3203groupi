@@ -170,6 +170,49 @@
             </div>
         </div>
 
+        <!-- List of extracted classes -->
+        <div class="container py-5">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h1 class="h4 mb-0">Course List</h1>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted" id="timestamp"></p>
+                    <ul class="list-group" id="course-list">
+                        <!-- Course list will be populated here -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            // Fetch the course list from the extracted_classes.txt file
+            fetch('../../backend/data_extraction/data/extracted_classes.txt')
+                .then(response => response.text())
+                .then(data => {
+                    const courses = data.split('\n');
+                    const courseListElement = document.getElementById('course-list');
+                    const timestampElement = document.getElementById('timestamp');
+        
+                    // Extract and display timestamp
+                    const timestamp = courses.shift();
+                    timestampElement.textContent = `Last updated: ${timestamp}`;
+        
+                    // Add courses to the list
+                    courses.forEach(course => {
+                        if (course.trim() !== "") {
+                            const li = document.createElement('li');
+                            li.textContent = course;
+                            li.className = 'list-group-item';
+                            courseListElement.appendChild(li);
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading the course list:', error);
+                });
+        </script>
+
 
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" 
         integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
