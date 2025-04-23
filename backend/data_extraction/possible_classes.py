@@ -27,3 +27,6 @@ with open("backend/data_extraction/data/extracted_classes.txt", "w") as file:
 
 # Print out that the courses have been extracted
 print("Courses have been saved to 'extracted_classes.txt'.")
+
+
+#this is a test
