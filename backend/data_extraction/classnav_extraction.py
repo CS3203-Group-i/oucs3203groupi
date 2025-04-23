@@ -7,7 +7,7 @@ from pathlib import Path
 from datetime import datetime
 import time
 
-# === Chrome setup ===
+# === Chrome setup ====
 options = webdriver.ChromeOptions()
 options.add_argument("--start-maximized")
 driver = webdriver.Chrome(options=options)
