@@ -26,13 +26,16 @@ def read_courses(cs_file_path):
                     subject = parts[1].strip().replace(" ", "")
                     course_code = parts[2].strip()
                     course_title = parts[4].strip()
-                    section = parts[3].strip()  # Assuming teacher is here
-                    teacher = parts[5].strip() # Assuming date/time is here
+                    section = parts[3].strip()  
+                    teacher = parts[5].strip()           
                     date = parts[6].strip()
+                    meeting_days = parts[7].strip()
+                    meeting_times = parts[8].strip()
+                    location = parts[9].strip()
                     # Remove 'G' from the course code if it starts with 'G'
                     if course_code.startswith('G'):
                         course_code = course_code[1:]
-                    courses.add(f"{subject} {course_code} {course_title} | Section: {section} | Teacher: {teacher} | Dates: {date}")
+                    courses.add(f"{subject} {course_code} {course_title} | Section: {section} | Teacher: {teacher} | Dates: {date} | Meeting days: {meeting_days} | Meeting times: {meeting_times} | Location: {location}")
 
     return courses
 
