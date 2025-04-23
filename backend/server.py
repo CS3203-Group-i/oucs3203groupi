@@ -62,7 +62,6 @@ def upload_pdf():
     return jsonify({'error': 'Invalid file type'}), 400
 
 @app.route('/check-upload-status')
-@app.route('/check-upload-status')
 def check_upload():
     file_path = os.path.join(BACKEND_DIR, 'data_extraction/user_data/flowchart.pdf')
     exists = os.path.isfile(file_path)
