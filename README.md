@@ -20,6 +20,8 @@ command: .\.venv\Scripts\Activate
 
 7. Add Dependencies
 command: pip install beautifulsoup4 requests transformers
+command: pip install flask
+command: pip install flask-cors
 
 8. Branching
 command git checkout -b "ticket name"

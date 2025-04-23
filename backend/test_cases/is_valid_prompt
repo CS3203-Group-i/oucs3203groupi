@@ -1,0 +1,62 @@
+# Checks if contains emojis
+# Checks if contains invalid symbols !/- 
+# Checks if no preference (empty, edge case)
+# Checks if longer than 300 characters (boundary)
+
+import unittest
+import re
+
+def is_valid_prompt(text):
+    # Test for empty prompt of preferences from user
+    if not text: 
+        return "Not valid, no preference such that it's empty."
+
+    # Test for boundary case of too long of preferences
+    if len(text) > 300:
+        return "Not valid, too many characters."
+
+    # Test for invalid symbols
+    if re.search(r"[!/-]", text):  # Check for invalid symbols
+        return "Not valid, contains invalid symbols."
+
+    if any(ord(char) > 127 for char in text):  # Check for emojis (non-ASCII)
+        return "Not valid, contains emoji."
+
+    return "Valid."
+
+class TestPromptValidation(unittest.TestCase):
+
+    # Edge case
+    def test_empty(self):
+        self.assertEqual(is_valid_prompt(""), "Not valid, no preference such that it's empty.")
+
+    # Boundary case
+    def test_large_characters(self):
+        self.assertEqual(is_valid_prompt("A" * 301), "Not valid, too many characters.")
+
+    # Test correct input
+    def test_correct(self):
+        self.assertEqual(is_valid_prompt("I want only afternoon classes."), "Valid.")
+
+    # Test incorrect input
+    def test_emoji(self):
+        self.assertEqual(is_valid_prompt("No morning classes 😊"), "Not valid, contains emoji.")
+
+    # Test another incorrect input
+    def test_invalid_symbols(self):
+        self.assertEqual(is_valid_prompt("Hello!&*#()"), "Not valid, contains invalid symbols.")
+
+if __name__ == "__main__":
+  
+    try:
+        with open("fake_input.txt", "r", encoding="utf-8") as file:
+            for line in file:
+                pref = line.strip()
+                if pref:  
+                    result = is_valid_prompt(pref)
+                    print(f"File Input: {repr(pref)}\nTest Results: {result}\n")
+    except FileNotFoundError:
+        print("Error: File 'fake_input.txt' not found.")
+
+
+    unittest.main()
