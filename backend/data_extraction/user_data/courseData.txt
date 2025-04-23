@@ -1,5 +1,2 @@
-Programming for Non-Majors with Python;C S 1213;Fall 2025
-Programming for Non-Majors with C;C S 1313;Fall 2025
-Java for Programmers;C S 1321;Fall 2025
-asynch:
+
 
