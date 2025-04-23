@@ -172,10 +172,10 @@ def filter_courses(cs_file_path, preferences_file_path, pdf_path):
        #     print(course)
    # else:
       #  print("No matching courses found.")
-
+                                           
 # Example usage
-cs_file_path = '../data_extraction/data/extracted_classnav.txt'  # Path to your CS courses text file
-preferences_file_path = '../test_cases/fake_input.txt'  # Path to your preferences text file
+cs_file_path = 'backend/data_extraction/data/extracted_classnav.txt'  # Path to your CS courses text file
+preferences_file_path = 'backend/data_extraction/user_data/courseData.txt'  # Path to your preferences text file
 pdf_path = 'tmp.pdf'  # Path to your PDF file
 
 filter_courses(cs_file_path, preferences_file_path, pdf_path)
