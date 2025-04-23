@@ -68,7 +68,8 @@ def check_upload():
     if exists:
         # If the file exists, run the filter script and return the filtered courses
         filtered_courses = run_filter_script()
-        return jsonify({'uploaded': True, 'filtered_courses': filtered_courses})
+        ai_result = run_ai_model()
+        return jsonify({'uploaded': True, 'filtered_courses': filtered_courses, 'ai_result': ai_result})
     else:
         return jsonify({'uploaded': False})
 
@@ -86,6 +87,26 @@ def run_filter_script():
             return [filtered_courses_path]
     else:
         return ["Error running filter script."]
+    
+def run_ai_model():
+    # Run the Python script (assuming ai_model_request.py is in the "ai_model" folder)
+    try:
+        result = subprocess.run(['python', 'models/ai_model_request.py'], check=True)
+
+        # Check if the AI script ran successfully
+        if result.returncode != 0:
+            return jsonify({'error': 'AI model failed to run', 'stderr': result.stderr.decode()}), 500
+
+        # Read the generated ai_result.txt file after running the AI script
+        ai_result_path = 'models/ai_result.txt'
+        if os.path.exists(ai_result_path):
+            with open(ai_result_path, 'r') as result_file:
+                ai_result = result_file.read()
+
+            # Ensure the ai_result is a string before returning
+            return ai_result
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     print("Serving frontend from:", FRONTEND_DIR)

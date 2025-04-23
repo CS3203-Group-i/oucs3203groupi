@@ -5,6 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Generate Schedule</title>
   <link rel="stylesheet" href="/style.css">
+  <style>
+    .day-container {
+      margin-bottom: 20px;
+    }
+    .day-container h4 {
+      margin: 0;
+      font-size: 1.2em;
+      font-weight: bold;
+    }
+    .day-container ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
+    .day-container li {
+      margin-left: 20px;
+    }
+  </style>
 </head>
 <body>
 
@@ -19,6 +36,12 @@
   <div id="coursesContainer" style="display: none;">
     <h3>Filtered Courses:</h3>
     <ul id="coursesList"></ul>
+  </div>
+
+  <!-- Displaying AI result -->
+  <div id="aiResultContainer" style="display: none;">
+    <h3>AI Generated Schedule:</h3>
+    <div id="scheduleContainer"></div>
   </div>
 
   <script src="/js/filter.js" defer></script>

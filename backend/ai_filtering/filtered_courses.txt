@@ -1,0 +1,8 @@
+CS 3203 Software Engineering | Section: 001 | Teacher: Abdulhak, Mansoor | Dates: Aug 25 - Dec 12 | Meeting days: MWF | Meeting times: 11:00 am - 11:50 am | Location: Gallogly Hall 127
+CS 4173 Computer Security | Section: 002 | Teacher: Wu, Yi | Dates: Aug 25 - Dec 12 | Meeting days: TR | Meeting times: 3:00 pm - 4:15 pm | Location: Carson Engr Ctr 441
+MATH 3333 Linear Algebra I | Section: 004 | Teacher: TBA | Dates: Aug 25 - Dec 12 | Meeting days: MWF | Meeting times: 9:00 am - 9:50 am | Location: Physical Science Ctr 222
+CS 4413 Algorithm Analysis | Section: 001 | Teacher: Grimley, Lauren E. | Dates: Aug 25 - Dec 12 | Meeting days: TR | Meeting times: 10:30 am - 11:45 am | Location: Dale Hall 206
+MATH 3333 Linear Algebra I | Section: 002 | Teacher: TBA | Dates: Aug 25 - Dec 12 | Meeting days: MWF | Meeting times: 2:00 pm - 2:50 pm | Location: Physical Science Ctr 114
+MATH 3333 Linear Algebra I    (HONORS) | Section: 007 | Teacher: Wang, Ying | Dates: Aug 25 - Dec 12 | Meeting days: MWF | Meeting times: 9:00 am - 9:50 am | Location: Physical Science Ctr 121
+MATH 3333 Linear Algebra I | Section: 006 | Teacher: Nance, Ty E. | Dates: Aug 25 - Dec 12 | Meeting days: MWF | Meeting times: 9:00 am - 9:50 am | Location: Physical Science Ctr 115
+MATH 3333 Linear Algebra I | Section: 001 | Teacher: Maddox, Julia | Dates: Aug 25 - Dec 12 | Meeting days: TR | Meeting times: 1:30 pm - 2:45 pm | Location: Physical Science Ctr 323
