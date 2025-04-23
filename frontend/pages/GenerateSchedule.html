@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generate Schedule</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+  <h1>Generate Schedule</h1>
+
+  <!-- Loading bar -->
+  <div id="loadingBarContainer" style="display: none;">
+    <div id="loadingBar" style="width: 0%; height: 20px; background-color: #4caf50;"></div>
+  </div>
+
+  <!-- Displaying filtered courses -->
+  <div id="coursesContainer" style="display: none;">
+    <h3>Filtered Courses:</h3>
+    <ul id="coursesList"></ul>
+  </div>
+
+  <script src="/js/filter.js" defer></script>
+  
+</body>
+</html>

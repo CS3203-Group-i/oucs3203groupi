@@ -1,6 +1,8 @@
 import os
 from flask import Flask, send_from_directory, request, jsonify, Blueprint
 from flask_cors import CORS
+import subprocess
+from subprocess import Popen
 
 # ─── Prep paths ────────────────────────────────────────────────────────────────
 script_dir = os.path.dirname(os.path.abspath(__file__))    # …/oucs3203groupi/backend
@@ -58,6 +60,33 @@ def upload_pdf():
         return jsonify({'message': 'File uploaded successfully', 'filename': filename}), 200
 
     return jsonify({'error': 'Invalid file type'}), 400
+
+@app.route('/check-upload-status')
+@app.route('/check-upload-status')
+def check_upload():
+    file_path = os.path.join(BACKEND_DIR, 'data_extraction/user_data/flowchart.pdf')
+    exists = os.path.isfile(file_path)
+    if exists:
+        # If the file exists, run the filter script and return the filtered courses
+        filtered_courses = run_filter_script()
+        return jsonify({'uploaded': True, 'filtered_courses': filtered_courses})
+    else:
+        return jsonify({'uploaded': False})
+
+def run_filter_script():
+    # Run the data_filter.py script
+    result = subprocess.run(['python', 'backend/ai_filtering/data_filter.py'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    
+    if result.returncode == 0:
+        # Assuming the filtered courses are saved in 'filtered_courses.txt'
+        filtered_courses_path = os.path.join(BACKEND_DIR, 'ai_filtering/filtered_courses.txt')
+        if os.path.exists(filtered_courses_path):
+            with open(filtered_courses_path, 'r') as file:
+                return file.readlines()
+        else:
+            return [filtered_courses_path]
+    else:
+        return ["Error running filter script."]
 
 if __name__ == '__main__':
     print("Serving frontend from:", FRONTEND_DIR)
