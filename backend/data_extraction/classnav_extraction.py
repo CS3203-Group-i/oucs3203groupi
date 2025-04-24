@@ -3,77 +3,127 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
-from datetime import datetime
 from pathlib import Path
+from datetime import datetime
 import time
 
-# Set up Chrome WebDriver
-driver = webdriver.Chrome()
+# === Chrome setup ====
+options = webdriver.ChromeOptions()
+options.add_argument("--start-maximized")
+driver = webdriver.Chrome(options=options)
 
-# 🎯 Load Fall 2025 semester directly
+# === Load Fall 2025 directly
 driver.get("https://classnav.ou.edu/#semester/202510")
+wait = WebDriverWait(driver, 15)
 
-# Wait until the table loads
-wait = WebDriverWait(driver, 20)
+# === Wait for class table, set to 100 entries per page
 wait.until(EC.presence_of_element_located((By.ID, "clist")))
-
-# Optional: Set table to show 100 entries per page
 Select(wait.until(EC.presence_of_element_located((By.NAME, "clist_length")))).select_by_value("100")
-time.sleep(3)  # Allow table to populate
+time.sleep(3)
 
-# Storage for all course rows
-all_data = []
-page_num = 1
-
-while True:
-    print(f"📄 Scraping page {page_num}")
-    soup = BeautifulSoup(driver.page_source, "html.parser")
-    table = soup.find("table", id="clist")
-    rows = table.find("tbody").find_all("tr")
-
-    for row in rows:
-        cols = row.find_all("td")
-        if len(cols) >= 8:
-            crn = cols[1].text.strip()
-            subject = cols[2].text.strip()
-            course = cols[3].text.strip()
-            section = cols[4].text.strip()
-            title = cols[5].text.strip()
-            instructor = cols[6].text.strip()
-            dates = cols[7].text.strip()
-            all_data.append([crn, subject, course, section, title, instructor, dates])
-
-    # Try to go to the next page
-    try:
-        next_btn = driver.find_element(By.ID, "clist_next")
-        if "disabled" in next_btn.get_attribute("class"):
-            print("✅ Reached last page.")
-            break
-        driver.execute_script("arguments[0].click();", next_btn)
-        time.sleep(2)
-        page_num += 1
-    except Exception as e:
-        print("⚠️ Error during pagination:", e)
-        break
-
-# Timestamp
-timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-# 📁 Set output path
+# === File output setup ===
 output_path = Path("backend/data_extraction/data/extracted_classnav.txt")
 output_path.parent.mkdir(parents=True, exist_ok=True)
 
-# ✍️ Write results to file
-with open(output_path, "w") as f:
-    f.write(f"ClassNav course extraction\nTimestamp: {timestamp}\n")
-    f.write("=" * 100 + "\n")
-    f.write("CRN | Subject | Course | Section | Title | Instructor | Dates\n")
-    f.write("=" * 100 + "\n")
-    for row in all_data:
-        f.write(" | ".join(row) + "\n")
+with open(output_path, "w", encoding="utf-8") as output_file:
+    output_file.write(f"ClassNav course extraction (Clean Table Format)\nTimestamp: {datetime.now()}\n")
+    output_file.write("-" * 140 + "\n")
+    output_file.write(
+        "CRN   | Subject | Course | Section | Title                     | Instructor        | Dates            | "
+        "Meeting Days | Meeting Times     | Location                     | Seats Remaining\n"
+    )
+    output_file.write("-" * 140 + "\n")
 
-print(f"\n✅ Finished scraping {len(all_data)} classes.")
-print(f"📄 Data saved to: {output_path}")
+    page_num = 1
+    while True:
+        print(f"\n📄 Scraping page {page_num}...")
 
-# Close browser
+        # Expand all rows at once
+        driver.execute_script("""
+            document.querySelectorAll('#clist tbody .odd td:first-child span.ui-icon, #clist tbody .even td:first-child span.ui-icon')
+                .forEach(e => e.click());
+        """)
+        time.sleep(2.5)
+
+        soup = BeautifulSoup(driver.page_source, "html.parser")
+        table = soup.find("table", id="clist")
+        all_rows = table.find("tbody").find_all("tr")
+
+        i = 0
+        while i < len(all_rows):
+            main = all_rows[i]
+
+            # Skip summary rows like Quick Facts
+            if "Quick Facts" in main.get_text():
+                i += 1
+                continue
+
+            cols = main.find_all("td")
+            if len(cols) < 9:
+                i += 1
+                continue
+
+            crn = cols[1].get_text(strip=True)
+            subject = cols[2].get_text(strip=True)
+            course = cols[3].get_text(strip=True)
+            section = cols[4].get_text(strip=True)
+            title = cols[5].get_text(strip=True)
+            instructor = cols[6].get_text(strip=True)
+            dates = cols[7].get_text(strip=True)
+            seats = cols[8].get_text(strip=True)
+
+            # default meeting data
+            date_range = meeting_times = meeting_days = meeting_location = "N/A"
+
+            if i + 1 < len(all_rows):
+                expanded = all_rows[i + 1]
+                table = expanded.select_one("table.MeetingDetails")
+
+                if table:
+                    date_ranges_list = []
+                    meeting_times_list = []
+                    meeting_days_list = []
+                    meeting_locations_list = []
+
+                    for r in table.select("tbody tr"):
+                        cells = r.find_all("td")
+                        if (
+                            len(cells) >= 4 and
+                            "Final Exam" not in cells[0].text and
+                            "Quick Facts" not in cells[0].text and
+                            "Schedule:" not in cells[0].text
+                        ):
+                            date_ranges_list.append(cells[0].get_text(strip=True))
+                            meeting_times_list.append(cells[1].get_text(strip=True))
+                            meeting_locations_list.append(cells[2].get_text(strip=True))
+                            meeting_days_list.append(cells[3].get_text(strip=True))
+
+                    date_range = " | ".join(date_ranges_list) or "N/A"
+                    meeting_times = " | ".join(meeting_times_list) or "N/A"
+                    meeting_location = " | ".join(meeting_locations_list) or "N/A"
+                    meeting_days = " | ".join(meeting_days_list) or "N/A"
+
+            # write clean formatted row
+            output_file.write(
+                f"{crn.ljust(6)}| {subject.ljust(7)}| {course.ljust(6)}| {section.ljust(8)}| {title.ljust(27)}| "
+                f"{instructor.ljust(18)}| {dates.ljust(18)}| {meeting_days.ljust(12)}| {meeting_times.ljust(20)}| "
+                f"{meeting_location.ljust(30)}| {seats.ljust(15)}\n"
+            )
+
+            i += 2  # skip expanded row
+
+        # Next page
+        try:
+            next_btn = driver.find_element(By.ID, "clist_next")
+            if "disabled" in next_btn.get_attribute("class"):
+                print("✅ Reached last page.")
+                break
+            driver.execute_script("arguments[0].click();", next_btn)
+            time.sleep(3)
+            page_num += 1
+        except Exception as e:
+            print("⚠️ Pagination error:", e)
+            break
+
 driver.quit()
+print(f"\n✅ Done! Data saved to: {output_path}")
