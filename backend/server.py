@@ -100,6 +100,7 @@ def run_filter_script():
         # Check if either of the filtered course files exists
         if os.path.exists(filtered_courses_pdf_path):
             with open(filtered_courses_pdf_path, 'r') as file:
+                #print("read...")
                 return file.readlines()
         elif os.path.exists(filtered_courses_manual_path):
             with open(filtered_courses_manual_path, 'r') as file:

@@ -7,15 +7,16 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(data => {
                 if (data.pdf_uploaded) {
                     alert('PDF uploaded successfully. Filter is running!');
-                    displayFilteredCourses(data.filtered_courses);
+                    
                 } else {
                     alert('PDF not uploaded!');
                 }
 
                 if (data.user_input_uploaded) {
-                    displayUserInput(data.user_input_lines);
+                    alert('User input also uploaded successfully. Filter is running!');
                 }
 
+                console.log('got to here.');
                 document.getElementById('loadingBarContainer').style.display = 'none';
             })
             .catch(error => {
@@ -24,41 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.getElementById('loadingBarContainer').style.display = 'none';
             });
     }
-
-    function displayFilteredCourses(courses) {
-        const coursesList = document.getElementById('coursesList');
-        const coursesContainer = document.getElementById('coursesContainer');
-
-        if (courses.length > 0) {
-            coursesList.innerHTML = '';
-
-            courses.forEach(course => {
-                const li = document.createElement('li');
-                li.textContent = course.trim();
-                coursesList.appendChild(li);
-            });
-
-            coursesContainer.style.display = 'block';
-        } else {
-            alert('No filtered courses found.');
-        }
-    }
-
-    function displayUserInput(lines) {
-        const userInputContainer = document.getElementById('userInputContainer');
-        if (userInputContainer) {
-            userInputContainer.innerHTML = '';
-
-            lines.forEach(line => {
-                const p = document.createElement('p');
-                p.textContent = line.trim();
-                userInputContainer.appendChild(p);
-            });
-
-            userInputContainer.style.display = 'block';
-        }
-    }
-
+ 
     function runAIModel() {
         const generateButton = document.getElementById('generateScheduleButton');
         const loadingBarContainer = document.getElementById('loadingBarContainer');
