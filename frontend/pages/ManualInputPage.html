@@ -311,22 +311,57 @@
                 }
 
                 // Append new input with a newline character
-                allInputs += text + "\n";
-                allInputs += asynchPreference.id + "\n";
-                document.getElementById("classNameInput").value + ";"
-                    + document.getElementById("courseCodeInput").value + ";"
-                    + document.getElementById("semesterInput").value + ";"
+                // allInputs += text + "\n";
+                // allInputs += asynchPreference.id + "\n";
 
-                // Send data to the backend (Node.js required)
-                fetch('http://127.0.0.1:5000/save', { // Flask runs on port 5000
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content: allInputs })
-                }).then(response => response.json())
-                .then(data => console.log("Server Response:", inputData))
-                .catch(error => console.error("Error:", error));
+                // document.getElementById("classNameInput").value + ";"
+                //     + document.getElementById("courseCodeInput").value + ";"
+                //     + document.getElementById("semesterInput").value + ";"
+
+                // Check for duplicates
+                function hasDuplicateCourses(arr) {
+                    const seen = new Set();
+
+                    for (let item of arr) {
+                        let [course, term] = item.split(';');
+
+                        // Normalize course: remove extra spaces, periods, and invisible characters
+                        let normalizedCourse = course
+                            .replace(/[.\s\u00A0\u200B-\u200D\uFEFF]+/g, '')  // Remove dots, spaces, non-breaking/invisible chars
+                            .toLowerCase(); // Optional: ignore case
+
+                        // Full comparison key: only normalize course part
+                        if (seen.has(normalizedCourse)) {
+                            console.log("ERROR: duplicate course: " + normalizedCourse);
+                            return true;
+                        }
+
+                        seen.add(normalizedCourse);
+                    }
+
+                    return false;
+                }
+
+                function handleSubmit() {
+                    if (hasDuplicates(allInputs)) {
+                        alert("Duplicate entries found. Please remove duplicates before submitting.");
+                        return false; // Prevent form submission
+                    } else {
+
+                        // Send data to the backend (Node.js required)
+                        fetch('http://127.0.0.1:5000/save', { // Flask runs on port 5000
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ content: allInputs })
+                        }).then(response => response.json())
+                        .then(data => console.log("Server Response:", inputData))
+                        .catch(error => console.error("Error:", error));
+                    }
+
+                }
 
                 console.log(allInputs); // Debugging output
+
             
 
             });
