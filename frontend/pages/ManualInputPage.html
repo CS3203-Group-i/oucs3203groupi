@@ -170,6 +170,21 @@
             </div>
         </div>
 
+        
+        <!-- List of user input classes -->
+        <div class="container py-5">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h1 class="h4 mb-0">Input List</h1>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group" id="input-list">
+                        <!-- User-added input list will be populated here -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+
         <!-- List of extracted classes -->
         <div class="container py-5">
             <div class="card shadow">
@@ -220,65 +235,95 @@
         integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
 
         <script>
-            let allInputs = ""; // Variable to store all input text
-    
+            let addedCourses = new Set();
+            let allInputs = "";
+            
             document.getElementById("addClassBtn").addEventListener("click", function () {
-                let text = document.getElementById("classNameInput").value + ";"
-                    + document.getElementById("courseCodeInput").value + ";"
-                    + document.getElementById("semesterInput").value;
-                
-                if (text.trim() === "") {
-                    alert("Please enter some text before saving.");
+                let className = document.getElementById("classNameInput").value.trim();
+                let courseCode = document.getElementById("courseCodeInput").value.trim();
+                let semester = document.getElementById("semesterInput").value.trim();
+            
+                if (className === "" || courseCode === "" || semester === "") {
+                    alert("Please fill out all fields before adding a course.");
                     return;
                 }
-    
-                // Append new input with a newline character
+            
+                let text = `${className}; ${courseCode}; ${semester}`;
+            
+                if (addedCourses.has(text)) {
+                    alert("This course has already been added.");
+                    return;
+                }
+            
+                addedCourses.add(text);
                 allInputs += text + "\n";
-                document.getElementById("classNameInput").value + ";"
-                    + document.getElementById("courseCodeInput").value + ";"
-                    + document.getElementById("semesterInput").value;
-
-                console.log(allInputs); // Debugging output
-
+            
+                const inputListElement = document.getElementById("input-list");
+                const li = document.createElement('li');
+                li.className = 'list-group-item';
+                li.textContent = text;
+                inputListElement.appendChild(li);
+            
+                // Clear the input fields after adding
+                document.getElementById("classNameInput").value = "";
+                document.getElementById("courseCodeInput").value = "";
+                document.getElementById("semesterInput").value = "";
             });
         </script>
-
+                   
+        <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
         <script>
             document.getElementById("submitBtn").addEventListener("click", function () {
-                let text = document.getElementById("classNameInput").value + ";"
-                    + document.getElementById("courseCodeInput").value + ";"
-                    + document.getElementById("semesterInput").value;
-
-                // Grab the selected ayschPreference button setting
-                let asynchPreference = document.querySelector('input[name="options"]:checked');
-                
-                
-                if (text.trim() === "") {
-                    alert("Please enter some text before saving.");
+                // Ensure there are courses added
+                if (addedCourses.size === 0) {
+                    alert("No courses added. Please add at least one course before submitting.");
                     return;
                 }
-
-                // Append new input with a newline character
-                allInputs += text + "\n";
-                allInputs += asynchPreference.id + "\n";
-                document.getElementById("classNameInput").value + ";"
-                    + document.getElementById("courseCodeInput").value + ";"
-                    + document.getElementById("semesterInput").value + ";"
-
-                // Send data to the backend (Node.js required)
+            
+                // Collect the added courses into a string for submission
+                let allInputs = "";
+                addedCourses.forEach(course => {
+                    allInputs += course + "\n";  // Append each course
+                });
+            
+                // Grab the selected asynchPreference button setting
+                let asynchPreference = document.querySelector('input[name="options"]:checked');
+                if (asynchPreference) {
+                    allInputs += asynchPreference.id + "\n";  // Append the selected preference
+                }
+            
+                // Send the course data to the backend
                 fetch('http://127.0.0.1:5000/save', { // Flask runs on port 5000
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ content: allInputs })
                 }).then(response => response.json())
-                .then(data => console.log("Server Response:", inputData))
-                .catch(error => console.error("Error:", error));
-
-                console.log(allInputs); // Debugging output
+                .then(data => {
+                    console.log("Server Response:", data);
+                    
+                    // Show success message
+                    alert("Courses successfully submitted!");
             
-
+                    // Trigger confetti animation
+                    confetti({
+                        particleCount: 200,
+                        spread: 70,
+                        origin: { y: 0.6 }
+                    });
+            
+                    // Reset the input list and courses
+                    document.getElementById("input-list").innerHTML = ""; // Clear the displayed list
+                    addedCourses.clear(); // Clear the added courses Set
+            
+                    // Reset input fields
+                    document.getElementById("classNameInput").value = "";
+                    document.getElementById("courseCodeInput").value = "";
+                    document.getElementById("semesterInput").value = "";
+                })
+                .catch(error => console.error("Error:", error));
+            
+                console.log("Submitted Courses:", Array.from(addedCourses)); // Debugging output
             });
-        </script>
-
+            </script>        
     </body>
 </html>

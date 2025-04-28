@@ -10,6 +10,7 @@ import time
 # === Chrome setup ====
 options = webdriver.ChromeOptions()
 options.add_argument("--start-maximized")
+options.add_argument("--headless")  # Run in headless mode
 driver = webdriver.Chrome(options=options)
 
 # === Load Fall 2025 directly
