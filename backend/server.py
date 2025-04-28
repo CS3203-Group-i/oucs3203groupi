@@ -27,6 +27,9 @@ backend_bp = Blueprint(
 )
 app.register_blueprint(backend_bp)
 
+with open('backend/data_extraction/user_data/courseData.txt', 'w') as f:
+    f.write("")
+
 # ─── Routes ───────────────────────────────────────────────────────────────────
 @app.route('/')
 def index():

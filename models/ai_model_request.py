@@ -3,6 +3,7 @@ import requests
 import re
 import json
 from collections import defaultdict
+import sys
 
 # === UNTOUCHABLE PROMPT: Just here as a reference ===
 prompt = """Given the following list of courses with their corresponding sections, times, and days, create an optimal schedule that ensures no time conflicts while taking exactly one section from each course. You can only take one section per course, and the sections must not overlap with each other. Put your final answer within []​. Do not reason step by step.
@@ -26,45 +27,7 @@ base_prompt = """Given the following list of courses with their corresponding se
 Courses:
 """
 
-filename = "backend/ai_filtering/filtered_courses.txt"
-courses = defaultdict(list)
-
-with open(filename, "r") as f:
-    lines = f.readlines()
-    for line in lines:
-        match = re.match(r"([A-Z]+\s\d+).*?\| Section: (\d+).*?Meeting days: (\w+).*?Meeting times: ([\d:apm\s\-]+)", line)
-        if match:
-            course_code = match.group(1).upper()
-            section = match.group(2).zfill(2)
-            days = match.group(3)
-            if days == "TR":
-                days = "T/TR"
-            time = match.group(4).strip().lower()
-            courses[course_code].append(f"Section {section}: {time} {days}")
-
-# Combine into full prompt for the model
-course_text = ""
-for course, sections in courses.items():
-    course_text += f"{course}:\n"
-    for s in sections:
-        course_text += f"{s}\n"
-
-active_prompt = base_prompt + course_text
-
-# === API SETTINGS ===
-use_gemini = True
-huggingface_model = "Qwen/Qwen2.5-Coder-32B-Instruct"
-#hf_api_key = os.getenv("HF_TW_API")
-gemini_api_key = os.getenv("GEMINI_API_KEY")
-
-def generate_with_huggingface(prompt):
-    if not hf_api_key:
-        raise ValueError("Hugging Face API key is missing.")
-    api_url = f"https://api-inference.huggingface.co/models/{huggingface_model}"
-    headers = {"Authorization": f"Bearer {hf_api_key}"}
-    payload = {"inputs": prompt, "parameters": {"max_length": 512, "temperature": 0.7}}
-    response = requests.post(api_url, headers=headers, json=payload)
-    return response.json()[0]["generated_text"] if response.status_code == 200 else f"Error {response.status_code}: {response.json()}"
+gemini_api_key = "I'm not giving this away!" 
 
 def generate_with_gemini(prompt):
     if not gemini_api_key:
@@ -75,13 +38,71 @@ def generate_with_gemini(prompt):
     response = requests.post(api_url, headers=headers, data=json.dumps(payload))
     return response.json()['candidates'][0]['content']['parts'][0]['text'] if response.status_code == 200 else f"Error {response.status_code}: {response.text}"
 
-# === GENERATE OUTPUT ===
-output = generate_with_gemini(active_prompt) if use_gemini else generate_with_huggingface(active_prompt)
-print("Generated output:\n", output)
+def behind_scenes(userInput):
+    if userInput == "pdf":
+        filename = "backend/ai_filtering/filtered_courses_pdf.txt"
+        courses = defaultdict(list)
 
-# Save the output into a text file
-output_path = 'models/ai_result.txt'
-with open(output_path, 'w') as file:
-    file.write(output)
+        with open(filename, "r") as f:
+            lines = f.readlines()
+            for line in lines:
+                match = re.match(r"([A-Z]+\s\d+).*?\| Section: (\d+).*?Meeting days: (\w+).*?Meeting times: ([\d:apm\s\-]+)", line)
+                if match:
+                    course_code = match.group(1).upper()
+                    section = match.group(2).zfill(2)
+                    days = match.group(3)
+                    if days == "TR":
+                        days = "T/TR"
+                    time = match.group(4).strip().lower()
+                    courses[course_code].append(f"Section {section}: {time} {days}")
 
-print(f"Output saved to {output_path}")
+        # Combine into full prompt for the model
+        course_text = ""
+        for course, sections in courses.items():
+            course_text += f"{course}:\n"
+            for s in sections:
+                course_text += f"{s}\n"
+
+        active_prompt = base_prompt + course_text
+    elif userInput == "manual":
+        filename = "backend/ai_filtering/filtered_courses_manual.txt"
+        courses = defaultdict(list)
+
+        with open(filename, "r") as f:
+            lines = f.readlines()
+            for line in lines:
+                match = re.match(r"([A-Z]+\s\d+).*?\| Section: (\d+).*?Meeting days: (\w+).*?Meeting times: ([\d:apm\s\-]+)", line)
+                if match:
+                    course_code = match.group(1).upper()
+                    section = match.group(2).zfill(2)
+                    days = match.group(3)
+                    if days == "TR":
+                        days = "T/TR"
+                    time = match.group(4).strip().lower()
+                    courses[course_code].append(f"Section {section}: {time} {days}")
+
+        # Combine into full prompt for the model
+        course_text = ""
+        for course, sections in courses.items():
+            course_text += f"{course}:\n"
+            for s in sections:
+                course_text += f"{s}\n"
+
+        active_prompt = base_prompt + course_text
+        #print(active_prompt)
+
+    # === GENERATE OUTPUT ===
+    output = generate_with_gemini(active_prompt)
+    print("Generated output:\n", output)
+
+    # Save the output into a text file
+    output_path = 'models/ai_result.txt'
+    with open(output_path, 'w') as file:
+        file.write(output)
+
+    print(f"Output saved to {output_path}")
+
+if __name__ == "__main__":
+    userInput = sys.argv[2]
+    behind_scenes(userInput)
+
