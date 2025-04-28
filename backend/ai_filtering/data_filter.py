@@ -5,7 +5,6 @@ import cv2
 import numpy as np
 from pdfminer.high_level import extract_pages
 from pdfminer.layout import LTTextBox
-
 import sys
 import os
 
@@ -55,14 +54,32 @@ def read_manual(manual_path):
                 manual_courses.add(f"{course_code}")
     #print(manual_courses)
     return manual_courses
-import os
+# Function to read RMP data from a text file
+def read_rmp_data(rmp_file_path):
+    rmp_data = {}
+    with open(rmp_file_path, "r") as file:
+        for line in file:
+            parts = line.strip().split(" | ")
+            if len(parts) > 2:
+                # Format the professor name as "First Name Last Name"
+                name = parts[0].strip()
+                score = parts[2].strip()
+                # Ensure we have the name in "First Name Last Name" format
+                name_parts = name.split()
+                if len(name_parts) >= 2:
+                    formatted_name = f"{name_parts[0]} {name_parts[1]}"  # "First Name Last Name"
+                    rmp_data[formatted_name] = score
+    return rmp_data
 
-# Main function to process all files and filter the courses
-def filter_courses(cs_file_path, manual_path, pdf_path):
+# Modified filter_courses function to include RMP data
+def filter_courses(cs_file_path, manual_path, pdf_path, rmp_file_path):
 
     # Initialize the filtered courses lists for PDF and manual
     filtered_courses_pdf = []
     filtered_courses_manual = []
+
+    # Load RMP data
+    rmp_data = read_rmp_data(rmp_file_path)
 
     # Check if the PDF file exists and process the PDF data
     if os.path.exists(pdf_path):
@@ -98,7 +115,21 @@ def filter_courses(cs_file_path, manual_path, pdf_path):
             parts = course_info.split()
             course_id_file = f"{parts[0]} {parts[1]}" if len(parts) >= 2 else parts[0]
             if course_id_file in extracted_texts_id_only:
-                filtered_courses_pdf.append(course_info)  # Append full course info
+
+                # Get the professor's name from the full course info and format it
+                #print(course_info)
+                tmp_prof_finder = course_info.split("|")
+                prof = tmp_prof_finder[2].replace("Teacher: ", "").replace(",","")
+                prof_swapped = " ".join(prof.split()[::-1])
+                #print(prof_swapped)
+                professor_name = prof_swapped 
+                #professor_name = parts[1].strip()  # Assuming the professor's name is in the 6th column
+
+                rmp_score = rmp_data.get(professor_name, "N/A")
+                #print(rmp_score)
+                # Add RMP score to the course information
+                full_course_info_with_rmp = f"{course_info} | Rate My Professor: {rmp_score}"
+                filtered_courses_pdf.append(full_course_info_with_rmp)  # Add the full course info with RMP score
 
     # Save filtered PDF courses to a separate file
     if filtered_courses_pdf:
@@ -124,7 +155,19 @@ def filter_courses(cs_file_path, manual_path, pdf_path):
                     full_course_id = f"{full_parts[0]} {full_parts[1]}"  # Extract the course ID from the full course info
 
                     if course_id == full_course_id:
-                        filtered_courses_manual.append(full_course_info)  # Add the full course info to filtered_courses_manual
+                        # Get the professor's name from the full course info and format it
+                        tmp_prof_finder = full_course_info.split("|")
+                        prof = tmp_prof_finder[2].replace("Teacher: ", "").replace(",","")
+                        prof_swapped = " ".join(prof.split()[::-1])
+                        #print(prof_swapped)
+                        professor_name = prof_swapped 
+                        #professor_name = parts[1].strip()  # Assuming the professor's name is in the 6th column
+  
+                        rmp_score = rmp_data.get(professor_name, "N/A")
+                        #print(rmp_score)
+                        # Add RMP score to the course information
+                        full_course_info_with_rmp = f"{full_course_info} | Rate My Professor: {rmp_score}"
+                        filtered_courses_manual.append(full_course_info_with_rmp)  # Add the full course info with RMP score
 
     # Save filtered manual courses to a separate file
     if filtered_courses_manual:
@@ -136,6 +179,7 @@ def filter_courses(cs_file_path, manual_path, pdf_path):
 cs_file_path = 'backend/data_extraction/data/extracted_classnav.txt'  # Path to your CS courses text file
 manual_path = 'backend/data_extraction/user_data/courseData.txt'  # Path to your manual text file
 pdf_path = 'backend/data_extraction/user_data/flowchart.pdf'  # Path to your PDF file
+rmp_file_path = 'backend/data_extraction/data/extracted_rmp.txt'  # Path to your RMP data file
 
 # Collect the filtered course details and save them to separate files
-filter_courses(cs_file_path, manual_path, pdf_path)
+filter_courses(cs_file_path, manual_path, pdf_path, rmp_file_path)
