@@ -63,36 +63,63 @@ def upload_pdf():
 
 @app.route('/check-upload-status')
 def check_upload():
-    file_path = os.path.join(BACKEND_DIR, 'data_extraction/user_data/flowchart.pdf')
-    exists = os.path.isfile(file_path)
-    if exists:
-        # If the file exists, run the filter script and return the filtered courses
+    pdf_path = os.path.join(BACKEND_DIR, 'data_extraction/user_data/flowchart.pdf')
+    user_input_path = os.path.join(BACKEND_DIR, 'data_extraction/user_data/courseData.txt')
+
+    pdf_exists = os.path.isfile(pdf_path)
+    user_input_exists = os.path.isfile(user_input_path)
+
+    user_input_lines = []
+    if user_input_exists:
+        with open(user_input_path, 'r') as file:
+            user_input_lines = file.readlines()
+
+    response = {
+        'pdf_uploaded': pdf_exists,
+        'user_input_uploaded': user_input_exists,
+        'user_input_lines': user_input_lines,
+        'filtered_courses': [],  # Default to empty list
+    }
+
+    # Run the filter if either PDF or manual input exists
+    if pdf_exists or user_input_exists:
         filtered_courses = run_filter_script()
-        ai_result = run_ai_model()
-        return jsonify({'uploaded': True, 'filtered_courses': filtered_courses, 'ai_result': ai_result})
-    else:
-        return jsonify({'uploaded': False})
+        response['filtered_courses'] = filtered_courses
+
+    return jsonify(response)
 
 def run_filter_script():
     # Run the data_filter.py script
     result = subprocess.run(['python', 'backend/ai_filtering/data_filter.py'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     
     if result.returncode == 0:
-        # Assuming the filtered courses are saved in 'filtered_courses.txt'
-        filtered_courses_path = os.path.join(BACKEND_DIR, 'ai_filtering/filtered_courses.txt')
-        if os.path.exists(filtered_courses_path):
-            with open(filtered_courses_path, 'r') as file:
+        # Define the paths for the filtered course files
+        filtered_courses_pdf_path = os.path.join(BACKEND_DIR, 'ai_filtering/filtered_courses_pdf.txt')
+        filtered_courses_manual_path = os.path.join(BACKEND_DIR, 'ai_filtering/filtered_courses_manual.txt')
+
+        # Check if either of the filtered course files exists
+        if os.path.exists(filtered_courses_pdf_path):
+            with open(filtered_courses_pdf_path, 'r') as file:
+                return file.readlines()
+        elif os.path.exists(filtered_courses_manual_path):
+            with open(filtered_courses_manual_path, 'r') as file:
                 return file.readlines()
         else:
-            return [filtered_courses_path]
+            return ["No filtered course files found."]
     else:
         return ["Error running filter script."]
-    
-def run_ai_model():
-    # Run the Python script (assuming ai_model_request.py is in the "ai_model" folder)
-    try:
-        result = subprocess.run(['python', 'models/ai_model_request.py'], check=True)
 
+def run_ai_model(use_pdf, use_manual):
+    try:
+        # Based on the selected checkboxes, we choose the model argument
+        if use_pdf:
+            result = subprocess.run(['python', 'models/ai_model_request.py', '--input', 'pdf'], check=True)
+            #print("HELP")
+        elif use_manual:
+            result = subprocess.run(['python', 'models/ai_model_request.py', '--input', 'manual'], check=True)
+        else:
+            return jsonify({'error': 'No input type selected'}), 400
+        
         # Check if the AI script ran successfully
         if result.returncode != 0:
             return jsonify({'error': 'AI model failed to run', 'stderr': result.stderr.decode()}), 500
@@ -102,11 +129,27 @@ def run_ai_model():
         if os.path.exists(ai_result_path):
             with open(ai_result_path, 'r') as result_file:
                 ai_result = result_file.read()
-
-            # Ensure the ai_result is a string before returning
             return ai_result
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/run-ai-model', methods=['POST'])
+def run_ai():
+    data = request.get_json()  # Get JSON data sent from the frontend
+    
+    # Get checkbox data (true/false) sent from frontend
+    use_pdf = data.get('use_pdf', False)  # Default to False if not present
+    use_manual = data.get('use_manual', False)  # Default to False if not present
+
+    if not (use_pdf or use_manual):
+        return jsonify({'error': 'Please select either PDF or Manual input.'}), 400
+    
+    # Only run the AI model here, not in the check-upload-status route
+    ai_result = run_ai_model(use_pdf, use_manual)
+    #print("ai result is: {ai_result}")
+    #print(ai_result)
+    return jsonify({'ai_result': ai_result}), 200
+
 
 if __name__ == '__main__':
     print("Serving frontend from:", FRONTEND_DIR)
