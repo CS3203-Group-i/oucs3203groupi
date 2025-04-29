@@ -149,17 +149,35 @@
 
                     </div>
 
-                    <div class="container">
-                        <p class="lead">Select:</p>
-                        <div class="btn-group btn-group-toggle pb-5" data-toggle="buttons">
+                    <div class="modal-body">
+                        <p class="lead">Preference toggles:</p>
+                    
+                        <!-- Asynchronous / In-Person Toggle -->
+                        <div class="btn-group btn-group-toggle pb-3" data-toggle="buttons">
                             <label class="btn btn-secondary active">
                                 <input type="radio" name="options" id="asynch:false" autocomplete="on" checked> In-Person
                             </label>
                             <label class="btn btn-secondary">
-                                <input type="radio" name="options" id="asynch:true" autocomplete="off"> Asynch
+                                <input type="radio" name="options" id="asynch:true" autocomplete="off"> Asynchronous
                             </label>
                         </div>
+                    
+                        <!-- Gap Preference Input -->
+                        <div class="form-group pt-4">
+                            <label for="gapPreferenceInput" class="form-label">Preferred Gap Between Classes (minutes):</label>
+                            <input 
+                                type="number" 
+                                class="form-control" 
+                                id="gapPreferenceInput" 
+                                name="gapPreferenceInput" 
+                                min="0" 
+                                max="1440" 
+                                step="60" 
+                                value="0"
+                                placeholder="Enter a multiple of 60 (e.g., 0, 60, 120)">
+                        </div>
                     </div>
+                    
 
 
                     <div class="modal-footer">
@@ -193,6 +211,10 @@
                 </div>
                 <div class="card-body">
                     <p class="text-muted" id="timestamp"></p>
+                    <!-- Search Bar -->
+                    <div class="mb-4">
+                        <input type="text" class="form-control" id="courseSearchInput" placeholder="Search for a course...">
+                    </div>
                     <ul class="list-group" id="course-list">
                         <!-- Course list will be populated here -->
                     </ul>
@@ -312,13 +334,28 @@
                             courseListElement.appendChild(li);
                         }
                     });
-                })
+                    
+                // search bar functionality
+            document.getElementById('courseSearchInput').addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const courses = document.querySelectorAll('#course-list li');
+
+                courses.forEach(course => {
+                    const courseText = course.textContent.toLowerCase();
+                    if (courseText.includes(searchTerm)) {
+                        course.style.display = '';
+                    } else {
+                        course.style.display = 'none';
+                    }
+                });
+        });
+
+    })
                 .catch(error => {
                     console.error('Error loading the course list:', error);
                 });
         </script>
-
-                   
+                      
         <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 
@@ -374,8 +411,6 @@
             
                 console.log("Submitted Courses:", Array.from(addedCourses)); // Debugging output
             });
-        </script>        
-
-
+        </script>     
     </body>
 </html>
