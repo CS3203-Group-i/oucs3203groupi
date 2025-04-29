@@ -49,6 +49,15 @@ document.addEventListener("DOMContentLoaded", function () {
         const formData = new FormData();
         formData.append("file", file);
 
+        const fileName = file.name.toLowerCase();
+        const disallowedExtensions = ["exe", "bat", "sh", "php", "js"]
+
+        if (disallowedExtensions.some(ext => fileName.endsWith(ext))) {
+            alert("This file type is not allowed.");
+            return;
+        }
+
+
         fetch("/upload_pdf", {
             method: "POST",
             body: formData,
