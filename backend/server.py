@@ -27,7 +27,19 @@ backend_bp = Blueprint(
 )
 app.register_blueprint(backend_bp)
 
-with open('backend/data_extraction/user_data/courseData.txt', 'w') as f:
+if os.path.exists('backend/data_extraction/user_data/courseData.txt'):
+    os.remove('backend/data_extraction/user_data/courseData.txt')
+
+if os.path.exists('backend/data_extraction/user_data/flowchart.pdf'):
+    os.remove('backend/data_extraction/user_data/flowchart.pdf')
+ 
+with open('backend/ai_filtering/filtered_courses_manual.txt', 'w') as f:
+    f.write("")
+
+with open('backend/ai_filtering/filtered_courses_pdf.txt', 'w') as f:
+    f.write("")
+
+with open('models/ai_result.txt', 'w') as f:
     f.write("")
 
 # ─── Routes ───────────────────────────────────────────────────────────────────

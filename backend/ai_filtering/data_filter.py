@@ -43,6 +43,7 @@ def read_manual(manual_path):
     manual_courses = set()
     with open(manual_path, "r") as file:
         for line in file:
+            line = line.replace('\xa0', ' ')
             #print(line)
             parts = line.strip().split(";")
             if len(parts) >= 3:
@@ -52,6 +53,7 @@ def read_manual(manual_path):
                 if "C S" in course_code:
                     course_code = course_code.replace("C S", "CS")
                 manual_courses.add(f"{course_code}")
+    #print(manual_courses)
     #print(manual_courses)
     return manual_courses
 # Function to read RMP data from a text file
@@ -148,6 +150,8 @@ def filter_courses(cs_file_path, manual_path, pdf_path, rmp_file_path):
             course_id = f"{parts[0]} {parts[1]}"  # This gives the course code in the format "CS 1213"
 
             # If the course ID exists in courses_id_only and is not already in filtered_courses_manual
+            course_id = course_id.replace("G", "")
+
             if course_id in courses_id_only and course_info not in filtered_courses_manual:
                 # Iterate through the 'courses' to get the full set of information for the matching course
                 for full_course_info in courses:
