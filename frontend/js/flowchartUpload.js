@@ -40,6 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
+         //Added for security to make sure file is of the type pdf
         if (file.type !== "application/pdf") {
             alert("Please upload a PDF file.");
             return;
