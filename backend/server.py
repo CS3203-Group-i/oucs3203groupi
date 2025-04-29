@@ -27,8 +27,8 @@ backend_bp = Blueprint(
 )
 app.register_blueprint(backend_bp)
 
-if os.path.exists('backend/data_extraction/user_data/courseData.txt'):
-    os.remove('backend/data_extraction/user_data/courseData.txt')
+with open('backend/data_extraction/user_data/courseData.txt', 'w') as f:
+    f.write("")
 
 if os.path.exists('backend/data_extraction/user_data/flowchart.pdf'):
     os.remove('backend/data_extraction/user_data/flowchart.pdf')
