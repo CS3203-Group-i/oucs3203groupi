@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function checkAndRunFilter() {
         document.getElementById('loadingBarContainer').style.display = 'block';
 
-        fetch('/check-upload-status')
+        fetch('http://127.0.0.1:5000/check-upload-status')
             .then(response => response.json())
             .then(data => {
                 if (data.pdf_uploaded) {
@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", function () {
             use_manual: useManual
         };
     
-        fetch('/run-ai-model', {
+        fetch('http://127.0.0.1:5000/run-ai-model', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

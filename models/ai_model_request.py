@@ -27,7 +27,7 @@ base_prompt = """Given the following list of courses with their corresponding se
 Courses:
 """
 
-gemini_api_key = "I'm not giving this away!" 
+gemini_api_key = "Not giving this away" 
 
 def generate_with_gemini(prompt):
     if not gemini_api_key:

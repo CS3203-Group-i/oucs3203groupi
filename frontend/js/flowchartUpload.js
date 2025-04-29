@@ -41,22 +41,28 @@ document.addEventListener("DOMContentLoaded", function () {
         const formData = new FormData();
         formData.append("file", file);
 
-        fetch("/upload_pdf", {
+        fetch("http://127.0.0.1:5000/upload_pdf", {
             method: "POST",
             body: formData,
         })
             .then((response) => {
                 if (!response.ok) {
-                    throw new Error("Upload failed.");
+                    return response.text();  // Get response as text if not JSON
                 }
-                return response.json();
+                return response.json();  // Return JSON if successful
             })
             .then((data) => {
-                alert("Upload successful: " + data.filename);
+                if (typeof data === 'string') {
+                    console.error("Error response:", data);  // If text, log it
+                    alert("Upload failed (1). " + data);
+                } else {
+                    alert("Upload successful: " + data.filename);
+                }
             })
             .catch((err) => {
                 console.error(err);
-                alert("Upload failed.");
+                alert("Upload failed (2).");
             });
+        
     }
 });
