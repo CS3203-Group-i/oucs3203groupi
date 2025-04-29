@@ -33,6 +33,13 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     function handleFileUpload(file) {
+        const isPDF = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
+
+        if (!isPDF) {
+            alert("Invalid file type. Please upload a PDF document.");
+            return;
+        }
+
         if (file.type !== "application/pdf") {
             alert("Please upload a PDF file.");
             return;
