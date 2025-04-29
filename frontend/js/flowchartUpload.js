@@ -33,6 +33,14 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     function handleFileUpload(file) {
+        const isPDF = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
+
+        if (!isPDF) {
+            alert("Invalid file type. Please upload a PDF document.");
+            return;
+        }
+
+         //Added for security to make sure file is of the type pdf
         if (file.type !== "application/pdf") {
             alert("Please upload a PDF file.");
             return;
@@ -40,6 +48,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const formData = new FormData();
         formData.append("file", file);
+
+        const fileName = file.name.toLowerCase();
+        const disallowedExtensions = ["exe", "bat", "sh", "php", "js"]
+
+        if (disallowedExtensions.some(ext => fileName.endsWith(ext))) {
+            alert("This file type is not allowed.");
+            return;
+        }
+
 
         fetch("/upload_pdf", {
             method: "POST",

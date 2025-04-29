@@ -3,6 +3,7 @@ from flask import Flask, send_from_directory, request, jsonify, Blueprint
 from flask_cors import CORS
 import subprocess
 from subprocess import Popen
+from werkzeug.utils import secure_filename
 
 # ─── Prep paths ────────────────────────────────────────────────────────────────
 script_dir = os.path.dirname(os.path.abspath(__file__))    # …/oucs3203groupi/backend
@@ -66,6 +67,14 @@ def upload_pdf():
     file = request.files['file']
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
+
+    # verify file name is secure to prevent malicious uploads
+    filename = secure_filename(file.filename)
+    if not filename.lower().endswith('.pdf'):
+        return jsonify({'error': 'Invalid file type, only PDF is allowed'}), 400
+
+    if any(bad_extension in filename.lower() for bad_extension in ['.exe', '.bat', '.sh', '.php']):
+        return jsonify({'error': 'This file type is not allowed'}), 400
 
     if file and file.filename.lower().endswith('.pdf'):
         save_path = os.path.join(BACKEND_DIR, "data_extraction", "user_data")
