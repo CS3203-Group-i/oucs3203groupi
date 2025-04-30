@@ -1,7 +1,113 @@
-<h2>Campus Resources</h2>
-<ul class="list-group">
-  <li class="list-group-item"><a href="https://www.ou.edu/checksheets">Degree Requirement Checksheets</a></li>
-  <li class="list-group-item"><a href="https://www.ou.edu/advising">Academic Advising</a></li>
-  <li class="list-group-item"><a href="https://libraries.ou.edu">Library</a></li>
-  <li class="list-group-item"><a href="https://www.ou.edu/coe/academics/tutoring">Engineering Tutoring Center</a></li>
-</ul>
+<!-- OU Campus Resource Page with Green Buttons -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kermy Scheduler | Campus Resources</title>
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+    crossorigin="anonymous"
+  />
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background-color: #f8f9fa;
+    }
+    h2 {
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    .resource-button {
+      transition: all 0.2s ease-in-out;
+    }
+    .resource-button:hover {
+      background-color: #198754;
+      color: #fff;
+      transform: translateY(-2px);
+    }
+    .footer-note {
+      font-size: 0.95rem;
+      margin-top: 2rem;
+    }
+    /* ✅ Green links */
+    a {
+      color: #198754;
+      text-decoration: none;
+    }
+    a:hover {
+      color: #145c32;
+      text-decoration: underline;
+    }
+  </style>
+  
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="../index.html">Kermy Scheduler</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="../index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="ManualInputPage.html">Manual Input</a></li>
+          <li class="nav-item"><a class="nav-link" href="SubmitFlowchartPage.html">Submit Flowchart</a></li>
+          <li class="nav-item"><a class="nav-link active fw-bold" href="CampusResourcePage.html">Resources</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page Content -->
+  <div class="container mt-5">
+    <div class="text-center mb-4">
+      <h2>OU Campus Resource Guide</h2>
+      <p class="text-muted">Here is a set of helpful support links for your needs/concerns as a student at the University of Oklahoma!</p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-4">
+        <a href="https://www.ou.edu/bursar/resources" target="_blank" class="btn btn-outline-success w-100 resource-button">General Campus Resources</a>
+      </div>
+      <div class="col-md-4">
+        <a href="https://www.ou.edu/studentlife/resources" target="_blank" class="btn btn-outline-success w-100 resource-button">Student Resources</a>
+      </div>
+      <div class="col-md-4">
+        <a href="https://www.ou.edu/advising" target="_blank" class="btn btn-outline-success w-100 resource-button">Academic Advising</a>
+      </div>
+      <div class="col-md-4">
+        <a href="https://www.ou.edu/healthservices" target="_blank" class="btn btn-outline-success w-100 resource-button">Health Services</a>
+      </div>
+      <div class="col-md-4">
+        <a href="https://www.ou.edu/ucc" target="_blank" class="btn btn-outline-success w-100 resource-button">Counseling Center</a>
+      </div>
+      <div class="col-md-4">
+        <a href="https://www.ou.edu/career" target="_blank" class="btn btn-outline-success w-100 resource-button">Career Services</a>
+      </div>
+      <div class="col-md-4">
+        <a href="https://www.ou.edu/ouit" target="_blank" class="btn btn-outline-success w-100 resource-button">IT Support</a>
+      </div>
+      <div class="col-md-4">
+        <a href="https://www.ou.edu/foodpantry" target="_blank" class="btn btn-outline-success w-100 resource-button">Food Pantry</a>
+      </div>
+      <div class="col-md-4">
+        <a href="https://www.ou.edu/police" target="_blank" class="btn btn-outline-success w-100 resource-button">OU Police (OUPD)</a>
+      </div>
+    </div>
+
+    <p class="footer-note text-center mt-5">
+      Looking for more? Visit the <a href="https://www.ou.edu/studentaffairs" target="_blank">OU Student Affairs</a> page for additional services.
+    </p>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+</body>
+</html>
