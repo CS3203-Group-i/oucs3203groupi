@@ -37,6 +37,12 @@
                             <a class="nav-link active" aria-current="page" href="CampusResourcePage.html">Campus Resource Page</a>
                         </li>
                     </ul>
+
+                        <!-- Search Bar in Navbar -->
+                        <form class="form-inline my-2 my-lg-0" onsubmit="handleSearch(event)">
+                            <input id="searchInput" class="form-control mr-sm-2" type="search" placeholder="Search for a course" aria-label="Search">
+                            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                        </form>  
                 </div>
             </div>
         </nav>
@@ -211,10 +217,13 @@
                 </div>
                 <div class="card-body">
                     <p class="text-muted" id="timestamp"></p>
+
                     <!-- Search Bar -->
-                    <div class="mb-4">
+                    <form id="courseSearchForm" class="mb-4 d-flex gap-2">
                         <input type="text" class="form-control" id="courseSearchInput" placeholder="Search for a course...">
-                    </div>
+                        <button class="btn btn-secondary" type="submit">Search</button>
+                    </form>
+
                     <ul class="list-group" id="course-list">
                         <!-- Course list will be populated here -->
                     </ul>
@@ -255,6 +264,38 @@
                 li.textContent = text;
                 inputListElement.appendChild(li);
             }
+
+            function handleSearch(event) {
+                event.preventDefault();
+                const navbarQuery = document.getElementById("searchInput").value.toLowerCase();
+                filterCourseList(navbarQuery);
+            }
+
+            function handleCourseListSearch(event) {
+                event.preventDefault();
+                const input = document.getElementById("courseSearchInput");
+                if (input) {
+                    const query = input.value.toLowerCase();
+                    filterCourseList(query);
+                }
+            }
+
+            function filterCourseList(query) {
+                const allCourses = document.querySelectorAll('#course-list li');
+                const cleanQuery = query.trim().toLowerCase();
+
+                allCourses.forEach(course => {
+                    const courseText = course.textContent.toLowerCase();
+
+                    // Show if the course includes the full query OR just starts with any word in the query
+                    const matches = cleanQuery
+                        .split(' ')
+                        .some(word => word.length > 0 && courseText.includes(word));
+
+                    course.style.display = matches ? '' : 'none';
+                });
+            }
+
         
             // Add event listener to main "Add Class" button
             document.getElementById("addClassBtn").addEventListener("click", function () {
@@ -332,28 +373,16 @@
                             li.appendChild(courseName);
                             li.appendChild(inputGroup);
                             courseListElement.appendChild(li);
-                        }
+
+                        }   
                     });
-                    
-                // search bar functionality
-            document.getElementById('courseSearchInput').addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase();
-                const courses = document.querySelectorAll('#course-list li');
+                    document.getElementById("courseSearchForm").addEventListener("submit", handleCourseListSearch);
 
-                courses.forEach(course => {
-                    const courseText = course.textContent.toLowerCase();
-                    if (courseText.includes(searchTerm)) {
-                        course.style.display = '';
-                    } else {
-                        course.style.display = 'none';
-                    }
-                });
-        });
-
-    })
-                .catch(error => {
-                    console.error('Error loading the course list:', error);
-                });
+    
+                })
+    .catch(error => {
+        console.error('Error loading the course list:', error);
+    });
         </script>
                       
         <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -378,6 +407,10 @@
                 if (asynchPreference) {
                     allInputs += asynchPreference.id + "\n";  // Append the selected preference
                 }
+                let gapPreference = document.getElementById("gapPreferenceInput").value;
+                allInputs += `gap:${gapPreference}\n`; // append the gap preference
+                console.log("All Inputs:", allInputs); // Debugging output
+
             
                 // Send the course data to the backend
                 fetch('http://127.0.0.1:5000/save', { // Flask runs on port 5000
@@ -411,6 +444,6 @@
             
                 console.log("Submitted Courses:", Array.from(addedCourses)); // Debugging output
             });
-        </script>     
+        </script>
     </body>
 </html>
