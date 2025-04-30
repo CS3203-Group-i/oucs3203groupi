@@ -4,6 +4,7 @@ import re
 import json
 from collections import defaultdict
 import sys
+import subprocess
 
 # === UNTOUCHABLE PROMPT: Just here as a reference ===
 prompt = """Given the following list of courses with their corresponding sections, times, and days, create an optimal schedule that ensures no time conflicts while taking exactly one section from each course. You can only take one section per course, and the sections must not overlap with each other. Put your final answer within []​. Do not reason step by step.
@@ -27,7 +28,7 @@ base_prompt = """Given the following list of courses with their corresponding se
 Courses:
 """
 
-gemini_api_key = "I'm not giving this away!" 
+gemini_api_key = "No. Bad security idea. Don't hardcode." 
 
 def generate_with_gemini(prompt):
     if not gemini_api_key:
@@ -90,6 +91,38 @@ def behind_scenes(userInput):
 
         active_prompt = base_prompt + course_text
         #print(active_prompt)
+
+
+    # === VALIDATE PROMPT FIRST ===
+    try:
+        validation_proc = subprocess.run(
+            ["python3", "backend/test_cases/is_valid_prompt.py", active_prompt],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        validation_result = validation_proc.stdout.strip()
+    except subprocess.CalledProcessError as e:
+        print("Prompt validation failed with error:", e.stderr)
+        return
+
+    if validation_result != "Valid.":
+        print(f"Prompt is invalid: {validation_result}")
+        return
+
+
+    # === CHECK FOR MALICIOUS CONTENT ===
+    try:
+        validation_proc = subprocess.run(
+            ["python3", "backend/security/is_prompt_safe.py", active_prompt],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        validation_result = validation_proc.stdout.strip()
+    except subprocess.CalledProcessError as e:
+        print("Prompt is unsafe: blocked due to malicious or inappropriate content.", e.stderr)
+        return
 
     # === GENERATE OUTPUT ===
     output = generate_with_gemini(active_prompt)

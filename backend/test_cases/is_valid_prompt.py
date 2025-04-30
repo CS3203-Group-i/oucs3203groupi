@@ -1,22 +1,23 @@
 # Checks if contains emojis
-# Checks if contains invalid symbols !/- 
-# Checks if no preference (empty, edge case)
-# Checks if longer than 300 characters (boundary)
+# Checks if contains invalid symbols !?@
+# Checks if no prompt (empty, edge case)
+# Checks if longer than 10000 characters (boundary)
 
 import unittest
 import re
+import sys
 
 def is_valid_prompt(text):
-    # Test for empty prompt of preferences from user
+    # Test for empty prompt
     if not text: 
-        return "Not valid, no preference such that it's empty."
+        return "Not valid, no prompt such that it's empty."
 
     # Test for boundary case of too long of preferences
-    if len(text) > 300:
+    if len(text) > 10000:
         return "Not valid, too many characters."
 
     # Test for invalid symbols
-    if re.search(r"[!/-]", text):  # Check for invalid symbols
+    if re.search(r"[!?@]", text):  # Check for invalid symbols
         return "Not valid, contains invalid symbols."
 
     if any(ord(char) > 127 for char in text):  # Check for emojis (non-ASCII)
@@ -28,11 +29,11 @@ class TestPromptValidation(unittest.TestCase):
 
     # Edge case
     def test_empty(self):
-        self.assertEqual(is_valid_prompt(""), "Not valid, no preference such that it's empty.")
+        self.assertEqual(is_valid_prompt(""), "Not valid, no prompt such that it's empty.")
 
     # Boundary case
     def test_large_characters(self):
-        self.assertEqual(is_valid_prompt("A" * 301), "Not valid, too many characters.")
+        self.assertEqual(is_valid_prompt("A" * 10000), "Not valid, too many characters.")
 
     # Test correct input
     def test_correct(self):
@@ -46,17 +47,10 @@ class TestPromptValidation(unittest.TestCase):
     def test_invalid_symbols(self):
         self.assertEqual(is_valid_prompt("Hello!&*#()"), "Not valid, contains invalid symbols.")
 
+# If this script is called directly (not imported)
 if __name__ == "__main__":
-  
-    try:
-        with open("fake_input.txt", "r", encoding="utf-8") as file:
-            for line in file:
-                pref = line.strip()
-                if pref:  
-                    result = is_valid_prompt(pref)
-                    print(f"File Input: {repr(pref)}\nTest Results: {result}\n")
-    except FileNotFoundError:
-        print("Error: File 'fake_input.txt' not found.")
-
-
-    unittest.main()
+    if len(sys.argv) > 1:
+        prompt = ' '.join(sys.argv[1:])  # Support multi-word prompts
+        print(is_valid_prompt(prompt))   # Output the result for subprocess capture
+    else:
+        unittest.main()
