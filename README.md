@@ -2,7 +2,7 @@
 Project for software engineering group i spring 2025 - OU class scheduler
 
 Project Overview
-This project is a Schedule Builder application that utilizes Python, BeautifulSoup, and Hugging Face to fetch and process class schedule data.
+This project is a Schedule Builder application that utilizes Python, BeautifulSoup, and Gemini to fetch and process class schedule data.
 
 1. Install Python
 
