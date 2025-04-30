@@ -12,12 +12,12 @@ def is_valid_prompt(text):
     if not text: 
         return "Not valid, no prompt such that it's empty."
 
-    # Test for boundary case of too long of preferences
+    # Test for boundary case of too long of prompt
     if len(text) > 10000:
         return "Not valid, too many characters."
 
     # Test for invalid symbols
-    if re.search(r"[!?@]", text):  # Check for invalid symbols
+    if re.search(r"[!?@]", text):  # Check for invalid symbols (regex)
         return "Not valid, contains invalid symbols."
 
     if any(ord(char) > 127 for char in text):  # Check for emojis (non-ASCII)
@@ -50,7 +50,7 @@ class TestPromptValidation(unittest.TestCase):
 # If this script is called directly (not imported)
 if __name__ == "__main__":
     if len(sys.argv) > 1:
-        prompt = ' '.join(sys.argv[1:])  # Support multi-word prompts
-        print(is_valid_prompt(prompt))   # Output the result for subprocess capture
+        prompt = ' '.join(sys.argv[1:])  # Support multi-word prompts aka form ai model request
+        print(is_valid_prompt(prompt))   # Output the result for subprocess
     else:
         unittest.main()

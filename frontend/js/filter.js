@@ -1,7 +1,10 @@
+// Auto filter upon opening generate schedule page
+
 document.addEventListener("DOMContentLoaded", function () {
     function checkAndRunFilter() {
         document.getElementById('loadingBarContainer').style.display = 'block';
 
+        // Checks if pdf or manual input uploaded
         fetch('/check-upload-status')
             .then(response => response.json())
             .then(data => {
@@ -26,6 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
  
+    // Runs ai model with pdf or manual input checkboxes checked
     function runAIModel() {
         const generateButton = document.getElementById('generateScheduleButton');
         const loadingBarContainer = document.getElementById('loadingBarContainer');
@@ -46,6 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
             use_manual: useManual
         };
     
+        // Sends in request to server to ai model
         fetch('/run-ai-model', {
             method: 'POST',
             headers: {
@@ -55,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(response => response.json())
         .then(data => {
-            console.log("AI Result Data:", data); // Log the response to see the structure
+            console.log("AI Result Data:", data); // Log the response 
             if (data.ai_result) {
                 displayAIResult(data.ai_result);
                 console.log('Hi')
@@ -77,7 +82,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     
     
-
+    // Displays the AI result prettily
     function displayAIResult(aiResult) {
         const aiResultContainer = document.getElementById('aiResultContainer');
         const scheduleContainer = document.getElementById('scheduleContainer');
@@ -90,6 +95,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .map(course => course.trim())
             .filter(course => course.length > 0);
 
+        // Going by weekdays only
         const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
         const schedule = {
             Monday: [],
@@ -162,10 +168,10 @@ document.addEventListener("DOMContentLoaded", function () {
         aiResultContainer.style.display = 'block';
     }
 
-    // Auto-check when page loads
+    // Auto check when page loads
     checkAndRunFilter();
 
-    // Hook up the AI model generation button
+    // AI model generation button
     const generateButton = document.getElementById('generateScheduleButton');
     if (generateButton) {
         generateButton.addEventListener('click', runAIModel);

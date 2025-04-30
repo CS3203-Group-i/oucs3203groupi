@@ -1,13 +1,12 @@
-// File: frontend/js/flowchartUpload.js
-
+// Upload flowcharts to the server
 document.addEventListener("DOMContentLoaded", function () {
     const dropZone = document.getElementById("drop-zone");
     const fileInput = document.getElementById("fileElem");
 
-    // Click to trigger file picker
+    // Click to upload
     dropZone.addEventListener("click", () => fileInput.click());
 
-    // Highlight drop zone on drag
+    // Drag and drop ability
     dropZone.addEventListener("dragover", (e) => {
         e.preventDefault();
         dropZone.classList.add("dragover");
@@ -25,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // File picker fallback
+    // Pick if no drag and drop
     fileInput.addEventListener("change", () => {
         if (fileInput.files.length) {
             handleFileUpload(fileInput.files[0]);
@@ -40,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-         //Added for security to make sure file is of the type pdf
+         // Additional security for file type pdf
         if (file.type !== "application/pdf") {
             alert("Please upload a PDF file.");
             return;
@@ -57,7 +56,7 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-
+        // Sends request to server to actually upload pdf and save it there
         fetch("/upload_pdf", {
             method: "POST",
             body: formData,

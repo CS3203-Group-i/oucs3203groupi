@@ -6,7 +6,7 @@ from collections import defaultdict
 import sys
 import subprocess
 
-# === UNTOUCHABLE PROMPT: Just here as a reference ===
+# OG example prompt
 prompt = """Given the following list of courses with their corresponding sections, times, and days, create an optimal schedule that ensures no time conflicts while taking exactly one section from each course. You can only take one section per course, and the sections must not overlap with each other. Put your final answer within []​. Do not reason step by step.
 Courses:
 Math 3333:
@@ -23,13 +23,15 @@ Section 01: 3-4pm M/W/F
 Section 02: 9-10am T/TR 
 """
 
-# === ACTUAL PROMPT USED ===
+# Base prompt
 base_prompt = """Given the following list of courses with their corresponding sections, times, and days, create an optimal schedule that ensures no time conflicts while taking exactly one section from each course. You must ONLY choose from the sections listed below. Do not invent, add, or infer any additional courses or sections. The sections listed are the ONLY valid options, and you must select one section per course. Please output your final answer in the form of a list of courses and sections, such as [CourseName Section 001 Days MWF Time 10-11:15am, CourseName Section 002 Days TR 6-7pm, ...]. Do not reason step by step, and do not add any extra courses.
 Courses:
 """
 
+# Update with own api key
 gemini_api_key = "No. Bad security idea. Don't hardcode." 
 
+# Function to generate with Gemini API
 def generate_with_gemini(prompt):
     if not gemini_api_key:
         raise ValueError("Gemini API key is missing.")
@@ -39,11 +41,13 @@ def generate_with_gemini(prompt):
     response = requests.post(api_url, headers=headers, data=json.dumps(payload))
     return response.json()['candidates'][0]['content']['parts'][0]['text'] if response.status_code == 200 else f"Error {response.status_code}: {response.text}"
 
+# Checks if user chose pdf or manual input
 def behind_scenes(userInput):
     if userInput == "pdf":
         filename = "backend/ai_filtering/filtered_courses_pdf.txt"
         courses = defaultdict(list)
 
+        # Reformatting input for ai model
         with open(filename, "r") as f:
             lines = f.readlines()
             for line in lines:
@@ -62,10 +66,13 @@ def behind_scenes(userInput):
         for course, sections in courses.items():
             course_text += f"{course}:\n"
             for s in sections:
-                course_text += f"{s}\n"
-
+                course_text += f"{s}\n" 
         active_prompt = base_prompt + course_text
+
     elif userInput == "manual":
+
+        # Reformatting input for ai model
+
         filename = "backend/ai_filtering/filtered_courses_manual.txt"
         courses = defaultdict(list)
 
@@ -88,12 +95,9 @@ def behind_scenes(userInput):
             course_text += f"{course}:\n"
             for s in sections:
                 course_text += f"{s}\n"
-
         active_prompt = base_prompt + course_text
-        #print(active_prompt)
 
-
-    # === VALIDATE PROMPT FIRST ===
+    # Regular test cases for valid prompt
     try:
         validation_proc = subprocess.run(
             ["python3", "backend/test_cases/is_valid_prompt.py", active_prompt],
@@ -111,7 +115,7 @@ def behind_scenes(userInput):
         return
 
 
-    # === CHECK FOR MALICIOUS CONTENT ===
+    # Security check on prompt
     try:
         validation_proc = subprocess.run(
             ["python3", "backend/security/is_prompt_safe.py", active_prompt],
@@ -124,7 +128,7 @@ def behind_scenes(userInput):
         print("Prompt is unsafe: blocked due to malicious or inappropriate content.", e.stderr)
         return
 
-    # === GENERATE OUTPUT ===
+    # Generate actual prompt
     output = generate_with_gemini(active_prompt)
     print("Generated output:\n", output)
 
@@ -136,6 +140,7 @@ def behind_scenes(userInput):
     print(f"Output saved to {output_path}")
 
 if __name__ == "__main__":
+    # Takes in information from system
     userInput = sys.argv[2]
     behind_scenes(userInput)
 

@@ -1,11 +1,14 @@
 import re
 import sys
 
+# Function to check if a prompt is safe
 def is_safe_prompt(prompt):
-    # Ensure prompt is a string, in case it comes as a list
+    
+    # Check if the prompt is empty
     if isinstance(prompt, list):
-        prompt = ' '.join(prompt)  # Join list elements into a single string
+        prompt = ' '.join(prompt)  
 
+    # Checks for malicious patterns in prompt
     malicious_patterns = [
         r"<script.*?>.*?</script>",  # Detects <script> tags for XSS
         r"eval\((.*?)\)",            # Detects eval functions (code execution risk)
@@ -16,19 +19,26 @@ def is_safe_prompt(prompt):
         r"(\b(?:system|os\.system)\b)",  # Detects system calls (could be risky)
     ]
     
+    # Loops through patterns to see if malicious prompt
     for pattern in malicious_patterns:
+        # checks regex pattern in prompt
         if re.search(pattern, prompt, re.IGNORECASE):
-            print(f"Malicious pattern detected: {pattern}")
-            return False  # Unsafe prompt
-    
-    return True  # Safe prompt  
 
+            # Bad prompt, not safe
+            print(f"Malicious pattern detected: {pattern}")
+            return False  
+    
+    # Prompt most likely safe
+    return True   
+
+# Printing out if prompt is safe or not
 def test_prompt(prompt):
     if is_safe_prompt(prompt):
         print("safe")
     else:
         print("unsafe")
 
+# Takes in system input (prompt) from ai model request and tests to see if safe or not
 if __name__ == "__main__":
     prompt = sys.argv[1:]
     test_prompt(prompt)

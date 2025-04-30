@@ -11,17 +11,18 @@ import os
 # Add the parent directory of 'backend' to sys.path (the root of the project)
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'backend')))
 
-# Now, you can import using the absolute import path
+# importing pdf extraction
 from data_extraction.pdf_extraction import extract_text_from_pdf_green_boxes_image_analysis
 
-# Function to read courses from a text file and filter for CS courses
+# Reading in classnav data
 def read_courses(cs_file_path):
     courses = set()
     with open(cs_file_path, "r") as file:
         for line in file:
+            # Conditional for only C S or MATH courses
             if " C S " in line or " MATH " in line:
                 parts = line.split('|')
-                if len(parts) >= 6:  # Ensure we have enough parts
+                if len(parts) >= 6:  
                     subject = parts[1].strip().replace(" ", "")
                     course_code = parts[2].strip()
                     course_title = parts[4].strip()
@@ -31,17 +32,26 @@ def read_courses(cs_file_path):
                     meeting_days = parts[7].strip()
                     meeting_times = parts[8].strip()
                     location = parts[9].strip()
+
                     # Remove 'G' from the course code if it starts with 'G'
+                    # Graduate level classes not supported yet
                     if course_code.startswith('G'):
                         course_code = course_code[1:]
                     courses.add(f"{subject} {course_code} {course_title} | Section: {section} | Teacher: {teacher} | Dates: {date} | Meeting days: {meeting_days} | Meeting times: {meeting_times} | Location: {location}")
 
+    # Return all cs and math courses
     return courses
 
-# Function to read manual from a text file
+# Function to read manual input from a text file
 def read_manual(manual_path):
+
+    # Makes a set of the manual courses to be filled up
     manual_courses = set()
+
+    # Opens up manual  file
     with open(manual_path, "r") as file:
+
+        # Goes through each line, splits and reformats it
         for line in file:
             line = line.replace('\xa0', ' ')
             #print(line)
@@ -50,49 +60,59 @@ def read_manual(manual_path):
                 course_title = parts[0].strip()
                 course_code = parts[1].strip()
                 term = parts[2].strip()
+
+                # Conditional for further consistency in formatting
                 if "C S" in course_code:
                     course_code = course_code.replace("C S", "CS")
                 manual_courses.add(f"{course_code}")
-    #print(manual_courses)
-    #print(manual_courses)
+
     return manual_courses
 
 # Function to read RMP data from a text file
 def read_rmp_data(rmp_file_path):
+
+    # Goes through rmp file and stores data
+
+    # Need to reformat everything since other extraction goes First Name Last Name
     rmp_data = {}
     with open(rmp_file_path, "r") as file:
         for line in file:
             parts = line.strip().split(" | ")
             if len(parts) > 2:
+
                 # Format the professor name as "First Name Last Name"
                 name = parts[0].strip()
                 score = parts[2].strip()
+
                 # Ensure we have the name in "First Name Last Name" format
                 name_parts = name.split()
                 if len(name_parts) >= 2:
-                    formatted_name = f"{name_parts[0]} {name_parts[1]}"  # "First Name Last Name"
+                    formatted_name = f"{name_parts[0]} {name_parts[1]}"  # First Name Last Name
                     rmp_data[formatted_name] = score
+
     return rmp_data
 
-# Modified filter_courses function to include RMP data
+# Filters through all courses to find intersecting ones based on actual courses and manual/pdf input
 def filter_courses(cs_file_path, manual_path, pdf_path, rmp_file_path):
 
     # Initialize the filtered courses lists for PDF and manual
     filtered_courses_pdf = []
     filtered_courses_manual = []
 
-    # Load RMP data
+    # Get RMP data
     rmp_data = read_rmp_data(rmp_file_path)
 
-    # Create a set of course IDs from the 'courses' read from the file
+    # Create a set of course IDs only from the 'courses' read from the file for intersection
     courses = read_courses(cs_file_path)
     courses_id_only = set()
     for course_info in courses:
         parts = course_info.split()
         courses_id_only.add(f"{parts[0]} {parts[1]}")
 
-    # Check if the PDF file exists and process the PDF data
+    # Check if the PDF file exists and process the PDF data if it does
     if os.path.exists(pdf_path):
+
+        # Green text boxes are the ones used by advisors
         courses = read_courses(cs_file_path)
         green_courses = extract_text_from_pdf_green_boxes_image_analysis(pdf_path)
 
@@ -105,6 +125,8 @@ def filter_courses(cs_file_path, manual_path, pdf_path, rmp_file_path):
             combined_text_parts = []
             include_rest = True
             for part in parts:
+
+                # Prereqs not supported yet
                 if "Prereq" in part:
                     include_rest = False
                 if include_rest:
@@ -116,24 +138,22 @@ def filter_courses(cs_file_path, manual_path, pdf_path, rmp_file_path):
 
         
 
-        # Find the intersection of course IDs from PDF and CS file
+        # Find the intersection of course IDs from PDF and ClassNav file
         for course_info in courses:
             parts = course_info.split()
             course_id_file = f"{parts[0]} {parts[1]}" if len(parts) >= 2 else parts[0]
             if course_id_file in extracted_texts_id_only:
 
                 # Get the professor's name from the full course info and format it
-                #print(course_info)
                 tmp_prof_finder = course_info.split("|")
                 prof = tmp_prof_finder[2].replace("Teacher: ", "").replace(",","")
                 prof_swapped = " ".join(prof.split()[::-1])
-                #print(prof_swapped)
                 professor_name = prof_swapped 
-                #professor_name = parts[1].strip()  # Assuming the professor's name is in the 6th column
 
+                # Tag on rmp score, N/A if not extracted or available
                 rmp_score = rmp_data.get(professor_name, "N/A")
-                #print(rmp_score)
-                # Add RMP score to the course information
+                
+                # Add RMP score to the full course information
                 full_course_info_with_rmp = f"{course_info} | Rate My Professor: {rmp_score}"
                 filtered_courses_pdf.append(full_course_info_with_rmp)  # Add the full course info with RMP score
 
@@ -143,64 +163,74 @@ def filter_courses(cs_file_path, manual_path, pdf_path, rmp_file_path):
             for course in filtered_courses_pdf:
                 f_pdf.write(course + "\n")
 
-    # Check if the manual file exists and process the manual data
+    # Check if the manual input file exists and process the manual input data ifso
     if os.path.exists(manual_path):
+
+        # Get all the manually inputted courses
         manual_courses = read_manual(manual_path)
 
-        # Iterate through manual_courses to match course IDs
+        # Iterate through manual_courses to match course IDs (intersecting)
         for course_info in manual_courses: 
 
-            #print(course_info)
-            # Extract the course ID from manual_courses (it should be in the format: "CS 1213 Programming for Non-Majors with Python | Term: Fall 2025")
+            # Extract the course ID from manual_courses
+            # OG format was "CS 1213 Programming for Non-Majors with Python | Term: Fall 2025")
             parts = course_info.split()
-            course_id = f"{parts[0]} {parts[1]}"  # This gives the course code in the format "CS 1213"
 
-            # If the course ID exists in courses_id_only and is not already in filtered_courses_manual
+            # Getting only course id aka CS 1213
+            course_id = f"{parts[0]} {parts[1]}"  
+
+            # Removes G if present such as CS G4513, graduate level classes not supported yet
             course_id = course_id.replace("G", "")
 
-        
+            # Conditional that checks if course id in manual input matches course id in ClassNav
             if course_id in courses_id_only:
-                #print(course_id)
+                
                 # Iterate through the 'courses' to get the full set of information for the matching course
                 for full_course_info in courses:
                     full_parts = full_course_info.split()
                     full_course_id = f"{full_parts[0]} {full_parts[1]}"  # Extract the course ID from the full course info
 
+                    # Extra conditional to check if course id in manual input matches course id in ClassNav 
+                    # Edge case, previous conditonal should have caught this but ocassionally doesn't due to formatting
                     if course_id == full_course_id:
                         
+                        # Conditional that checks for labs and disc
                         if 'Lab-' in full_course_info or 'Disc-' in full_course_info:
+
                         # Replace last digit of the second part with '0'
+                        # Helps AI still designate the course in the final result
                             prefix = full_parts[1][:-1]
                             full_parts[1] = prefix + '0'
                             full_course_id = f"{full_parts[0]} {full_parts[1]}"
-                            # Recombine into full_course_info if needed
+
+                            # Recombine into full_course_info with course ID updated for lab/disc
                             full_course_info = ' '.join(full_parts) + ' ' + ' '.join(full_parts[2:])  # append the rest back
                             #print(full_course_info)
+                            
                         # Get the professor's name from the full course info and format it
                         tmp_prof_finder = full_course_info.split("|")
                         prof = tmp_prof_finder[2].replace("Teacher: ", "").replace(",","")
                         prof_swapped = " ".join(prof.split()[::-1])
-                        #print(prof_swapped)
                         professor_name = prof_swapped 
-                        #professor_name = parts[1].strip()  # Assuming the professor's name is in the 6th column
-  
+    
+                        # Get rmp if applicable
                         rmp_score = rmp_data.get(professor_name, "N/A")
-                        #print(rmp_score)
-                        # Add RMP score to the course information
-                        full_course_info_with_rmp = f"{full_course_info} | Rate My Professor: {rmp_score}"
-                        filtered_courses_manual.append(full_course_info_with_rmp)  # Add the full course info with RMP score
 
-    # Save filtered manual courses to a separate file
+                        # Combines full course info with rmp
+                        full_course_info_with_rmp = f"{full_course_info} | Rate My Professor: {rmp_score}"
+                        filtered_courses_manual.append(full_course_info_with_rmp)  
+
+    # Save filtered manually inputted courses to a separate file
     if filtered_courses_manual:
         with open("backend/ai_filtering/filtered_courses_manual.txt", "w") as f_manual:
             for course in filtered_courses_manual:
                 f_manual.write(course + "\n")
 
-# Example usage
-cs_file_path = 'backend/data_extraction/data/extracted_classnav.txt'  # Path to your CS courses text file
-manual_path = 'backend/data_extraction/user_data/courseData.txt'  # Path to your manual text file
-pdf_path = 'backend/data_extraction/user_data/flowchart.pdf'  # Path to your PDF file
-rmp_file_path = 'backend/data_extraction/data/extracted_rmp.txt'  # Path to your RMP data file
+# Paths
+cs_file_path = 'backend/data_extraction/data/extracted_classnav.txt'  # Path to your CS courses ClassNav
+manual_path = 'backend/data_extraction/user_data/courseData.txt'  # Path to your manually inputted text file
+pdf_path = 'backend/data_extraction/user_data/flowchart.pdf'  # Path to your PDF inputted file
+rmp_file_path = 'backend/data_extraction/data/extracted_rmp.txt'  # Path to your RMP extracted data
 
-# Collect the filtered course details and save them to separate files
+# Collect the filtered course details and save them to separate files based on paths
 filter_courses(cs_file_path, manual_path, pdf_path, rmp_file_path)
