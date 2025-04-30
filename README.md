@@ -13,7 +13,7 @@ During installation, check the box ✅ "Add Python to PATH
 2. Clone Repository
 
 ```
-command: git clone https://github.com/payleyrandels/oucs3203groupi.git
+command: git clone https://github.com/CS3203-Group-i/oucs3203groupi
 ```
 
 3. Create Virtual Enviroment
@@ -51,3 +51,9 @@ Inside of oucs3203groupi directory
 ```
 command: python3 backend/server.py
 ```
+
+8. Update api key
+
+In models/ai_model_request.py:
+
+Update gemini_api_key variable with own api key
