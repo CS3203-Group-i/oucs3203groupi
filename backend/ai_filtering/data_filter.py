@@ -56,6 +56,7 @@ def read_manual(manual_path):
     #print(manual_courses)
     #print(manual_courses)
     return manual_courses
+
 # Function to read RMP data from a text file
 def read_rmp_data(rmp_file_path):
     rmp_data = {}
@@ -144,7 +145,9 @@ def filter_courses(cs_file_path, manual_path, pdf_path, rmp_file_path):
         manual_courses = read_manual(manual_path)
 
         # Iterate through manual_courses to match course IDs
-        for course_info in manual_courses:
+        for course_info in manual_courses: 
+
+            #print(course_info)
             # Extract the course ID from manual_courses (it should be in the format: "CS 1213 Programming for Non-Majors with Python | Term: Fall 2025")
             parts = course_info.split()
             course_id = f"{parts[0]} {parts[1]}"  # This gives the course code in the format "CS 1213"
@@ -152,13 +155,23 @@ def filter_courses(cs_file_path, manual_path, pdf_path, rmp_file_path):
             # If the course ID exists in courses_id_only and is not already in filtered_courses_manual
             course_id = course_id.replace("G", "")
 
-            if course_id in courses_id_only and course_info not in filtered_courses_manual:
+            if course_id in courses_id_only:
+                #print(course_id)
                 # Iterate through the 'courses' to get the full set of information for the matching course
                 for full_course_info in courses:
                     full_parts = full_course_info.split()
                     full_course_id = f"{full_parts[0]} {full_parts[1]}"  # Extract the course ID from the full course info
 
                     if course_id == full_course_id:
+                        
+                        if 'Lab-' in full_course_info or 'Disc-' in full_course_info:
+                        # Replace last digit of the second part with '0'
+                            prefix = full_parts[1][:-1]
+                            full_parts[1] = prefix + '0'
+                            full_course_id = f"{full_parts[0]} {full_parts[1]}"
+                            # Recombine into full_course_info if needed
+                            full_course_info = ' '.join(full_parts) + ' ' + ' '.join(full_parts[2:])  # append the rest back
+                            #print(full_course_info)
                         # Get the professor's name from the full course info and format it
                         tmp_prof_finder = full_course_info.split("|")
                         prof = tmp_prof_finder[2].replace("Teacher: ", "").replace(",","")
