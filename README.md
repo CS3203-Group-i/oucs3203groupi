@@ -10,19 +10,19 @@ Ensure you have Python installed. Download it from
 https://www.python.org/downloads/
 During installation, check the box ✅ "Add Python to PATH
 
-3. Clone Repository
+2. Clone Repository
 
 ```
 command: git clone https://github.com/payleyrandels/oucs3203groupi.git
 ```
 
-5. Create Virtual Enviroment
+3. Create Virtual Enviroment
 
 ```sh
 command: python3 -m venv venv
 ```
 
-6. Activate Environment
+4. Activate Environment
 
 Windows
 ```
@@ -33,19 +33,19 @@ Linux
 command: source venv/bin/activate
 ```
 
-7. Add Dependencies
+5. Add Dependencies
 
 ```
 command: pip install -r requirements.txt
 ```
 
-8. Branching
+6. Branching
 
 command git checkout -b "ticket name"
 create a MR into main, with two peer reviewers
 once accepted merge into main 
 
-9. Activate Server
+7. Activate Server
 
 Inside of oucs3203groupi directory
 ```
