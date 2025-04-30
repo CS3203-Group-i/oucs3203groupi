@@ -84,6 +84,13 @@ def filter_courses(cs_file_path, manual_path, pdf_path, rmp_file_path):
     # Load RMP data
     rmp_data = read_rmp_data(rmp_file_path)
 
+    # Create a set of course IDs from the 'courses' read from the file
+    courses = read_courses(cs_file_path)
+    courses_id_only = set()
+    for course_info in courses:
+        parts = course_info.split()
+        courses_id_only.add(f"{parts[0]} {parts[1]}")
+
     # Check if the PDF file exists and process the PDF data
     if os.path.exists(pdf_path):
         courses = read_courses(cs_file_path)
@@ -107,11 +114,7 @@ def filter_courses(cs_file_path, manual_path, pdf_path, rmp_file_path):
                 extracted_texts.append(" ".join(combined_text_parts))
                 extracted_texts_id_only.append(f"{combined_text_parts[0]} {combined_text_parts[1]}")
 
-        # Create a set of course IDs from the 'courses' read from the file
-        courses_id_only = set()
-        for course_info in courses:
-            parts = course_info.split()
-            courses_id_only.add(f"{parts[0]} {parts[1]}")
+        
 
         # Find the intersection of course IDs from PDF and CS file
         for course_info in courses:
@@ -155,6 +158,7 @@ def filter_courses(cs_file_path, manual_path, pdf_path, rmp_file_path):
             # If the course ID exists in courses_id_only and is not already in filtered_courses_manual
             course_id = course_id.replace("G", "")
 
+        
             if course_id in courses_id_only:
                 #print(course_id)
                 # Iterate through the 'courses' to get the full set of information for the matching course
