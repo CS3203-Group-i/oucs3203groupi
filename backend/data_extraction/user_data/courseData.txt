@@ -1,0 +1,9 @@
+Programming for Non-Majors with Python; C S 1213; fall 2025
+Programming for Non-Majors with C; C S 1313; fall 2025
+asynch:false
+gap:0
+
+Programming for Non-Majors with Python; C S 1213; fall 2025
+asynch:false
+gap:0
+
